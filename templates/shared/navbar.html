@@ -128,7 +128,12 @@
 								<!-- <li><a href="#">Committee Head</a></li>
 								<li><a href="#">Committee Members</a></li> -->
 								<!-- <li><a href="{% url 'directory' %}">Directory</a></li> -->
-								<li><a href="{% url 'register' %}">Register</a></li>
+								{% if user.is_authenticated %}
+								<li><a href="{% url 'logout' %}">Logout</a></li>
+								{% else %}
+									<li><a href="{% url 'login' %}">Login</a></li>
+									<li><a href="{% url 'register' %}">Register</a></li>
+								{% endif %}
 								<!-- <li><a href="{% url 'career' %}">Career</a></li>
 								-->
 							</ul>
