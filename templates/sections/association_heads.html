@@ -23,15 +23,15 @@
                                     <img src="{{ profile.photo.url }}" 
                                          class="img-fluid rounded" 
                                          alt="{{ leader.user.full_name }}"
-                                         style="height: 250px; object-fit: cover; width: 100%;">
+                                         >
                                 {% else %}
-                                    <img src="{% static 'assets/images/committee/commitee-1.jpg' %}" 
+                                    <img src="{% static 'assets/images/committee/default.png' %}" 
                                          class="img-fluid rounded" 
                                          alt="{{ leader.user.full_name }}"
-                                         style="height: 250px; object-fit: cover; width: 100%;">
+                                        >
                                 {% endif %}
                             </div>
-                            <h3 class="mt-3">
+                            <h3>
                                 {{ leader.user.full_name|upper }}
                                 <span class="committee-deg d-block mt-2">
                                     {{ leader.position.display_title }}
