@@ -1,0 +1,118 @@
+.error-page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    .animate-element {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+
+        li {
+            position: absolute;
+
+            &:nth-child(1) {
+                top: 37%;
+                left: 11%;
+            }
+
+            &:nth-child(2) {
+                bottom: 29%;
+                left: 11%;
+            }
+
+            &:nth-child(3) {
+                top: 25%;
+                right: 100px;
+            }
+
+            &:nth-child(4) {
+                bottom: 33%;
+                right: 12%;
+            }
+
+            @media(max-width: 991px) {
+                &:nth-child(1) {
+                    top: 18%;
+                    left: 2%;
+                }
+
+                &:nth-child(2) {
+                    bottom: 10%;
+                    left: 3%;
+                }
+
+                &:nth-child(3) {
+                    top: 16%;
+                    right: 25px;
+
+                }
+
+                &:nth-child(4) {
+                    bottom: 5%;
+                    right: 2%;
+                }
+            }
+        }
+    }
+}
+
+.error-image {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.error-page-content-wrapper {
+	@media(min-width: 992px) {
+		margin-top: 70px;
+	}
+}
+
+.error-content {
+    .error-title {
+        font-size: 40px;
+        line-height: 54px;
+        color: #2c2c51;
+        font-weight: 700;
+        margin-bottom: 20px;
+
+        @media(max-width: 576px) {
+            font-size: 30px;
+            line-height: 44px;
+
+            br {
+                display: none;
+            }
+        }
+    }
+
+    .subtitle {
+        font-size: 20px;
+        color: #6b717c;
+        margin-bottom: 54px;
+    }
+
+    .button-container {
+        .gp-btn {
+            padding: 11px 27px;
+        }
+
+        .btn-grey {
+            margin-left: 20px;
+
+            @media(max-width: 420px) {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+
+
+    }
+}

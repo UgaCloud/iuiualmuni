@@ -1,0 +1,52 @@
+.sidebar-area-wrap {
+	margin-bottom: 50px;
+
+	.single-sidebar-wrap {
+		background-color: $white;
+		padding: 30px 45px;
+		margin-bottom: 30px;
+
+		.sidebar-title {
+			@include font-size(21);
+			line-height: 1.2;
+			@include font-weight(600);
+			margin-bottom: 25px;
+		}
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.sidebar-body {
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+
+				a {
+					color: $paragraph-color;
+					border: 1px solid $dark-halka;
+					padding: 10px 12px;
+					margin-right: 5px;
+					margin-bottom: 10px;
+					@include font-size(14);
+					text-transform: capitalize;
+					@include transition(0.4s);
+					line-height: 1;
+
+					&:hover,
+					&:focus {
+						background-color: $brand-color;
+						border-color: $brand-color;
+						color: $white;
+					}
+				}
+
+				.active {
+					background-color: $brand-color;
+					border-color: $brand-color;
+					color: $white;
+				}
+			}
+		}
+	}
+}

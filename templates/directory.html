@@ -1,0 +1,36 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Directory - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="directory-v1" class="directory-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/directory-banner.html' %}
+
+<!--============================-->
+<!--=         Directory        =-->
+<!--============================-->
+{% include 'sections/directory.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

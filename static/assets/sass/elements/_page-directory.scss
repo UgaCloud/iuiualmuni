@@ -1,0 +1,108 @@
+.directory-page-content-warp {
+  .directory-text-wrap {
+    h2 {
+      @include font-size(48);
+      line-height: 1;
+      @include font-weight(300);
+      margin-bottom: 70px;
+      color: $halka;
+      strong {
+        color: $brand-color;
+      }
+    }
+    .table-search-area {
+      form {
+        line-height: 1;
+        input {
+          border: 1px solid $brand-color;
+          padding: 15px 20px 16px;
+          color: $halka;
+          &:focus {
+            box-shadow: none;
+            outline: none;
+          }
+        }
+        .nice-select {
+          padding: 0;
+          height: 52px;
+          line-height: 50px;
+          width: 95px;
+          text-align: center !important;
+          float: none;
+          margin-left: -4px;
+          .list {
+            right: 0;
+            left: auto;
+          }
+        }
+      }
+      .nice-select, input, button {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .btn-brand {
+        padding: 17px 30px;
+        @include font-weight(500);
+        @include font-size(15);
+        line-height: 1;
+        margin-left: 10px;
+        &:hover, &:focus {
+          background-color: $ash-black;
+          color: $white;
+        }
+      }
+    }
+    .show-memeber{
+      color: $title-color;
+      margin-top: 8px;
+      span{
+        color: $brand-color;
+      }
+    }
+  }
+  .pagination-wrap{
+    margin-top:30px;
+  }
+}
+
+.directory-table {
+  margin-top: 50px;
+  .table {
+    thead {
+      background-color: $brand-color;
+      color: $white;
+      th {
+        padding: 15px 20px;
+        @include font-size(20);
+        @include font-weight(700);
+      }
+    }
+    tbody {
+      tr {
+        td {
+          background-color: $section-bg;
+          color: $halka;
+          @include font-weight(500);
+          @include font-size(18);
+          line-height: 1;
+          vertical-align: middle;
+          padding: 17px 10px;
+          img {
+            width: 50px;
+            height: 50px;
+            @include rounded(50px);
+            margin-right: 10px;
+            border: 2px solid $brand-color-light;
+          }
+          &:nth-child(2n) {
+            background-color: $white;
+          }
+          &:first-child {
+            width: 35%;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+}

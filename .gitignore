@@ -1,0 +1,365 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Django-specific ignores (KEEP MIGRATIONS)
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+
+# Static files (collected)
+staticfiles/
+static_root/
+
+# Media files
+media/
+uploads/
+!media/.gitkeep
+!uploads/.gitkeep
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+# -----------------------------------------------------------------------------
+
+# Django secret key (never commit!)
+secret_key.txt
+*.key
+*.pem
+
+# Database backups
+*.dump
+*.backup
+*.bak
+
+# Session files
+*.session
+
+# Cache
+.cache/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local development files
+local_settings.py
+dev_settings.py
+test_settings.py
+
+# Migration files - WE KEEP THESE (DO NOT IGNORE)
+# !accounts/migrations/
+# !accounts/migrations/__init__.py
+
+# If you're using Docker
+docker-compose.override.yml
+
+# If you're using Redis
+dump.rdb
+
+# If you're using Celery
+celerybeat-schedule.*
+
+# If you're using PostgreSQL
+*.pid
+*.socket
+
+# Coverage reports
+.coverage
+.coverage.*
+
+# Test files
+*.pyc
+test_*.py
+*_test.py
+
+# Jupyter
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project-specific ignores
+# -----------------------------------------------------------------------------
+
+# Django media and static files (collected versions)
+/media/
+/staticfiles/
+/static_root/
+
+# Python virtual environment
+/venv/
+/env/
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+
+# Cache
+.cache/
+__pycache__/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Security
+secret_key.txt
+*.key
+*.pem
+*.crt
+*.csr
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# IDE
+.project
+.pydevproject
+.settings/
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node modules (if using frontend build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build directories
+build/
+dist/
+*.egg-info/
+
+# Documentation
+docs/_build/
+
+# Testing
+.pytest_cache/
+.tox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Docker
+docker-compose.override.yml
+
+# Redis
+dump.rdb
+
+# PostgreSQL
+postgres_data/
+
+# NOTE: MIGRATIONS ARE COMMITTED - DO NOT IGNORE THEM
+# Migration files are essential for database schema synchronization
+# across development, staging, and production environments

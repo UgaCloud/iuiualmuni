@@ -1,0 +1,103 @@
+{% load static %}
+<section id="page-content-wrap">
+	<div class="register-page-wrapper section-padding">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="register-page-inner">
+						<div class="col-lg-10 m-auto">
+							<div class="register-form-content">
+								<div class="row justify-content-between">
+									<!-- Signin Area Content Start -->
+									<!-- <div class="col-lg-4 col-md-6 text-center">
+										<div class="display-table">
+											<div class="display-table-cell">
+												<div class="signin-area-wrap">
+													<h4>Already a Member?</h4>
+													<div class="sign-form">
+														<form action="index.html">
+															<div class="col-12 col-sm-6">
+																<div class="form-group">
+																	<label for="register_email">Email</label>
+																	<input type="email" class="form-control"
+																		   id="register_email" name="register_email"/>
+																</div>
+															</div>
+	
+															<div class="col-12 col-sm-6">
+																<div class="form-group">
+																	<label for="register_password">Password</label>
+																	<input type="password" class="form-control"
+																		   id="register_password" name="register_password"/>
+																</div>
+															</div>
+															<button type="submit" class="btn btn-reg">Login</button>
+														</form>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div> -->
+									<!-- Signin Area Content End -->
+
+									<!-- Regsiter Form Area Start -->
+									<div class="col-lg-7 col-md-6 ml-auto">
+										<div class="register-form-wrap">
+											<h3>registration Form</h3>
+											<!-- Add this at the top of your template where you want messages to appear -->
+											{% if messages %}
+												{% for message in messages %}
+												<div class="alert alert-{{ message.tags }} alert-dismissible fade show text-danger" role="alert">
+													{{ message }}
+													<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+												</div>
+												{% endfor %}
+											{% endif %}
+											<div class="register-form">
+												<form method="POST" action="{% url 'login' %}">
+													{% csrf_token %}
+													<div class="row">
+														<div class="col-12 col-sm-6">
+															<div class="form-group">
+																<label for="register_email">Email</label>
+																<input type="email" class="form-control"
+																	   id="register_email" name="register_email"/>
+															</div>
+														</div>
+
+														<div class="col-12 col-sm-6">
+															<div class="form-group">
+																<label for="register_password">Password</label>
+																<input type="password" class="form-control"
+																	   id="register_password" name="register_password"/>
+															</div>
+														</div>
+													</div>
+													
+
+													<div class="form-group">
+														<!-- <div class="custom-control custom-checkbox float-lg-right">
+															<input type="checkbox" class="custom-control-input"
+																   id="customCheck1">
+															<label class="custom-control-label" for="customCheck1"> I
+																have read and agree to the <a href="#">Alumni</a> Terms
+																of Service</label>
+														</div> -->
+														<input type="submit" class="btn btn-reg" value="Login">
+													</div>
+													<label class="custom-control-label" for="customCheck1"> I
+														Don't have an account <a href="{% url 'register' %}">Register</a></label>
+												</form>
+											</div>
+										</div>
+									</div>
+									<!-- Regsiter Form Area End -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

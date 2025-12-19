@@ -1,0 +1,114 @@
+#page-content-wrap {
+	.about-page-content-wrap {
+		padding-top: 170px;
+		background-color: $section-bg;
+
+		.single-about-text {
+			background-color: $white;
+			padding: 50px;
+			position: relative;
+			@include font-size($font-size-base);
+			margin-top: 150px;
+
+			.year {
+				@include font-size(100);
+				line-height: 1;
+				color: $white;
+				text-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+				position: absolute;
+				top: -75px;
+				right: 25px;
+			}
+
+			h2 {
+				@include font-size(36);
+				line-height: 1;
+				@include font-weight(700);
+				margin-bottom: 20px;
+			}
+
+			.img-left {
+				margin-top: -100px;
+				margin-left: -97px;
+			}
+
+			.img-right {
+				margin-top: -100px;
+				margin-right: -118px;
+			}
+
+			&:first-child {
+				img {
+					filter: grayscale(100%);
+				}
+			}
+
+			&:nth-child(2n) {
+				.year {
+					right: auto;
+					left: 0px;
+				}
+			}
+
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+	}
+
+	.our-honorable-commitee {
+		.honorable-committee-list {
+			.single-committee-member {
+				margin-top: 50px;
+			}
+		}
+	}
+
+	.about-page-area-title {
+		margin-bottom: 50px;
+
+		h2 {
+			@include font-size(36);
+			line-height: 1;
+		}
+	}
+}
+
+/* --== About Area Start ==-- */
+#about-area{
+    .about-area-wrapper{
+        position: relative;
+        z-index: 1;
+        .about-content-wrap{
+            background-color: $section-bg;
+            border: 10px solid $light-blue;
+            padding: 36px 10px 40px 260px;
+            .about-thumb{
+                display: none;
+            }
+            a.btn-brand{
+            margin-top: 25px;
+                &:hover{
+                    background-color: $ash-black;
+                    color: $white;
+                }
+            }
+            .section-title{
+                margin-bottom: 30px;
+            }
+        }
+        &:before{
+            background-image: url(../images/misc/about-bg.jpg);
+            background-size: cover;
+            content: "";
+            position: absolute;
+            width: 39%;
+            height: 85%;
+            top: 50%;
+            transform: translateY(-50%);
+            left:0;
+            z-index:2
+            ;
+        }
+    }
+}

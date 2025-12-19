@@ -1,0 +1,159 @@
+// Front size mixin add px and rem values
+@mixin font-size($size) {
+	$base-font-size: 18px;
+	font-size: $size + px;
+	font-size: $size / 10 + rem;
+}
+
+// Example: @include font-size(16px);
+
+// Use this mixin to set the font size of an element
+@mixin font($size, $line-height: $line-height-base) {
+	@include font-size($size);
+	line-height: $line-height;
+}
+
+// Transitions mixin (for cross-browser compatibility) ease-in-out is the default timing function for transitions
+@mixin transition($duration: 0.3s, $timing-function: ease-in-out) {
+	-webkit-transition: all $duration $timing-function;
+	-moz-transition: all $duration $timing-function;
+	-ms-transition: all $duration $timing-function;
+	-o-transition: all $duration $timing-function;
+	transition: all $duration $timing-function;
+}
+
+// Example: @include transition(all, 0.3s, ease-in-out);
+
+// Font weight mixin
+@mixin font-weight($weight) {
+	font-weight: $weight;
+}
+
+// Example: @include font-weight(500);
+
+// Opacity mixin
+@mixin opacity($opacity) {
+	opacity: $opacity;
+}
+
+// Example: @include opacity(0.5);
+
+// Border radius mixin
+@mixin rounded($radius: 3px) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	border-radius: $radius;
+}
+
+// Example: @include rounded(5px);
+
+// Box shadow mixin
+@mixin box-shadow($x: 0, $y: 0, $blur: 0, $color: #000) {
+	-webkit-box-shadow: $x $y $blur $color;
+	-moz-box-shadow: $x $y $blur $color;
+	box-shadow: $x $y $blur $color;
+}
+
+// Example: @include box-shadow(0, 3px, 5px, 0, #000);
+
+@mixin text-field {
+	display: inline-block;
+	outline: none;
+	text-decoration: none;
+	font: 14px/100% Arial, Helvetica, sans-serif;
+	padding: .5em;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+	@include rounded();
+	@include box-shadow(0, 1px, 2px, rgba(0, 0, 0, 0.2));
+}
+
+@mixin button($color: $red, $text_color: $white) {
+	display: inline-block;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: 14px/100% Arial, Helvetica, sans-serif;
+	padding: .5em 2em .55em;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+	@include rounded();
+	@include box-shadow(0, 1px, 2px, rgba(0, 0, 0, 0.2));
+	color: $text_color !important;
+	font-weight: bold;
+	border: solid 1px darken($color, 18%);
+	background: $color;
+	@include gradient(saturate($color, 15%), darken($color, 15%));
+
+	&:hover {
+		text-decoration: none;
+		background: saturate($color, 10%);
+		@include gradient(saturate($color, 5%), darken($color, 5%));
+	}
+
+	&:active {
+		position: relative;
+		top: 1px;
+		color: saturate($color, 15%);
+		@include gradient(saturate($color, 15%), lighten($color, 15%));
+	}
+}
+
+@mixin rounded($radius: 0.5em) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	border-radius: $radius;
+}
+
+
+@mixin gradient($from, $to) {
+	background: -webkit-gradient(linear, left top, left bottom, from($from), to($to));
+	background: -moz-linear-gradient(top, $from, $to);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$from}', endColorstr='#{$to}');
+}
+
+
+//usage: @include shift([property],[duration],[easing]);
+@mixin shift($property: all, $duration: .3s, $ease: linear) {
+	-webkit-transition: $property $duration $ease;
+	-moz-transition: $property $duration $ease;
+	-o-transition: $property $duration $ease;
+	transition: $property $duration $ease;
+}
+
+
+@mixin keyframes($animation-name) {
+	@-webkit-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@-moz-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@-ms-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@-o-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@keyframes #{$animation-name} {
+		@content;
+	}
+}
+
+@mixin animation($str) {
+	-webkit-animation: #{$str};
+	-moz-animation: #{$str};
+	-ms-animation: #{$str};
+	-o-animation: #{$str};
+	animation: #{$str};
+}
+
+@mixin bg-gradient() {
+	background: -webkit-gradient(linear, left bottom, left top, from(rgba(0, 0, 0, 1)), color-stop(50%, rgba(0, 0, 0, 0)), to(rgba(0, 0, 0, 0)));
+	background: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%);
+	background: -o-linear-gradient(bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%);
+	background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%);
+}

@@ -1,0 +1,147 @@
+{% load static %}
+<header class="site-header header-fixed" data-responsive-width="991">
+	<div class="header-topbar">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-6 col-sm-7 col-7">
+					<div class="preheader-left">
+						<a href="mailto:info@codeboxr.com"><strong>Email:</strong> info@codeboxr.com</a>
+						<a href="mailto:info@construc.com"><strong>Hotline:</strong> 880 454 5477</a>
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-sm-5 col-5 text-end">
+					{% if user.is_authenticated %}
+					<div class="preheader-right">
+						<a title="Login" class="btn-auth btn-auth-rev" href="{% url 'logout' %}">Logout</a>
+					</div>
+					{% else %}
+					<div class="preheader-right">
+						<a title="Login" class="btn-auth btn-auth-rev" href="{% url 'login' %}">Login</a>
+						<a title="Register" class="btn-auth btn-auth" href="{% url 'register' %}">Signup</a>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.header-topbar -->
+
+	<div class="container">
+		<div class="header-inner">
+			<nav id="site-navigation" class="main-nav">
+				<div class="site-logo">
+					<a href="{% url 'home' %}" class="logo">
+						<img
+							src="{% static 'assets/images/logo/iuiuaa.png' %}"
+							alt="site logo"
+							width="80px"
+							height="80px"
+							class="main-logo"
+						/>
+						<img
+							src="{% static 'assets/images/logo/iuiuaa.png' %}"
+							alt="site logo"
+							width="80px"
+							height="80px"
+							class="logo-sticky"
+						/>
+					</a>
+
+					<div class="burger-menu">
+						<span class="bar-one"></span>
+						<span class="bar-two"></span>
+						<span class="bar-three"></span>
+					</div>
+				</div>
+				<!-- /.site-logo -->
+
+				<div
+					class="menu-wrapper main-nav-container canvas-menu-wrapper"
+					id="mega-menu-wrap"
+				>
+					<div class="canvas-header">
+						<div class="mobile-offcanvas-logo">
+							<a href="{% url 'home' %}">
+								<img src="{% static 'assets/images/logo/iuiuaa.png' %}" alt="site logo" class="logo-sticky"
+								/>
+							</a>
+						</div>
+
+						<div class="close-menu" id="page-close-main-menu">
+							<i class="fas fa-times"></i>
+						</div>
+					</div>
+
+					<ul class="codeboxr-main-menu">
+						<li>
+							<a href="{% url 'home' %}">Home</a>
+						</li>
+						<li><a href="{% url 'about' %}">About</a></li>
+
+						<li class="menu-item-depth-0">
+							<a href="{% url 'contact' %}">Contact</a>
+						</li>
+						<!-- <li><a href="{% url 'event' %}">Event</a></li>
+						<li><a href="{% url 'gallery' %}">Gallery</a></li> -->
+
+						<!-- <li class="has-submenu menu-item-depth-0">
+							<a href="blog.html">Blog</a>
+							<ul class="sub-menu">
+								<li><a href="blog.html">Blog List</a></li>
+								<li>
+									<a href="single-blog.html"
+									>Single Blog Right Sidebar</a
+									>
+								</li>
+								<li>
+									<a href="single-blog-leftsidebar.html"
+									>Single Bolg Left Sidebar</a
+									>
+								</li>
+								<li>
+									<a href="single-blog-nosidebar.html"
+									>Single Blog No Sidrebar</a
+									>
+								</li>
+							</ul>
+						</li> -->
+						<li class="has-submenu menu-item-depth-0">
+							<a href="#">More</a>
+
+							<ul class="sub-menu">
+								<!-- <li class="has-submenu">
+									<a href="{% url 'gallery' %}">Gallery</a>
+									<ul class="sub-menu">
+										<li>
+											<a href="{% url 'gallery' %}">Gallery</a>
+										</li>
+										<li>
+											<a href="{% url 'gallery_single' %}"
+											>Single Album</a
+											>
+										</li>
+									</ul>
+								</li> -->
+								<li><a href="{% url 'association_heads' %}">Association Heads</a></li>
+								<li><a href="{% url 'members' %}">Association Members</a></li>
+								<!-- <li><a href="#">Committee Head</a></li>
+								<li><a href="#">Committee Members</a></li> -->
+								<!-- <li><a href="{% url 'directory' %}">Directory</a></li> -->
+								<li><a href="{% url 'register' %}">Register</a></li>
+								<!-- <li><a href="{% url 'career' %}">Career</a></li>
+								-->
+							</ul>
+						</li>
+						
+					</ul>
+				</div>
+				<!-- /.menu-wrapper -->
+			</nav>
+			<!-- /.site-nav -->
+		</div>
+		<!-- /.header-inner -->
+	</div>
+	<!-- /.container-full -->
+</header>
+<!-- /.site-header -->

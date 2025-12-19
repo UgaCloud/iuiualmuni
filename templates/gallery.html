@@ -1,0 +1,36 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Gallery - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="gallery-v1" class="gallery-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/gallery-banner.html' %}
+
+<!--=========================-->
+<!--=         Gallery       =-->
+<!--=========================-->
+{% include 'sections/gallery-page.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

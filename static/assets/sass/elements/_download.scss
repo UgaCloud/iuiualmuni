@@ -1,0 +1,212 @@
+.downloads {
+    padding-bottom: 158px;
+
+    @media(max-width: 991px) {
+        padding-bottom: 50px;
+    }
+}
+
+.download-contents {
+    .section-heading {
+        .section-title {
+            font-size: 40px;
+            line-height: 50px;
+            margin-bottom: 20px;
+
+            @media(max-width: 576px) {
+                font-size: 28px;		
+                line-height: 38px;
+    
+                br {
+                    display: none;
+                }
+            }
+        }
+        p {
+            font-size: 18px;
+            line-height: 30px;
+            margin-bottom: 40px;
+        }
+    }
+    .button-container {
+        margin-top: 0;
+        .btn-outline {
+            margin-left: 20px;
+
+            @media(max-width: 480px) {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+
+        .app-btn {
+            box-shadow: none;
+        }
+    }
+}
+
+
+
+.extra-link-box {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 50px;
+    .link-icon {
+        height: 50px;
+        width: 50px;
+        line-height: 53px;
+        text-align: center;
+        background: #fa4987;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 22px;
+        margin-right: 20px;
+        box-shadow: 0px 20px 30px 0px rgba(250, 89, 146, 0.3);
+    }
+    .link-content {
+        flex: 2;
+        align-items: center;
+        .title {
+            font-size: 16px;
+            font-weight: 400;
+            margin: 0;
+            line-height: 26px;
+        }
+        a {
+            color: $color__theme-1;
+            i {
+                display: inline-block;
+                vertical-align: middle;
+            }
+            &:hover {
+                color: #2c2c51;
+            }
+        }
+    }
+}
+
+.download-feature-image-wrapper {
+    .image-container {
+        position: relative;
+        max-height: 615px;
+
+        @media(max-width: 991px) {
+            max-width: 620px;
+        }
+    }
+    .image-one {
+        position: relative;
+        z-index: 3;
+        margin-left: 65px;
+
+        @media(max-width: 1200px) {
+            margin-left: 0;
+        }
+    }
+    .image-two,
+    .dot {
+        position: absolute;
+    }
+    .image-two {
+        left: 270px;
+        top: 50px;
+        z-index: 2;
+
+        @media(max-width: 1200px) {
+            left: 170px;
+        }
+
+        @media(max-width: 576px) {
+            left: 100px;
+        }
+
+        @media(max-width: 440px) {
+            left: 60px;
+        }
+    }
+    .dot {
+        right: -25px;
+        bottom: 20px;
+        z-index: 1;
+        animation: jump 3s infinite;
+
+        @media(max-width: 1200px) {
+            right: 30px;
+        }
+    }
+    .circle {
+        position: absolute;
+        right: -40%;
+        top: -20%;
+        height: 650px;
+        width: 650px;
+        background: #f6f9fb;
+        border-radius: 50%;
+
+        @media(max-width: 1600px) {
+            right: -20%;
+        }
+
+        @media(max-width: 1440px) {
+            right: -7%;
+            height: 550px;
+            width: 550px;
+        }
+
+        @media(max-width: 1200px) {
+            right: 0;    
+            top: -10%;        
+        }
+    }
+}
+
+
+.download-two {
+    position: relative;
+    overflow: hidden;
+    padding: 0 0 50px 0;
+    @media (max-width:1200px) {
+        padding: 90px 0;
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        background-color: #fdf8fb;
+        height: 550px;
+        width: 100%;
+        top: -12px;
+        left: 0;
+    }
+    .button-container {
+        .download-btn {
+            margin-left: 16px !important;
+        }
+    }
+    .app-section-heading {
+        .section-title {
+            margin-bottom: 32px;
+        }
+        margin-bottom: 51px;
+        p {
+            font-size: 16px;
+            line-height: 28px;
+        }
+    }
+    .image-one {
+        margin-right: -215px;
+        margin-left: 6px;
+        top: 50px;
+        @media (max-width:1200px) {
+            margin-right: 0;
+            margin-left: 0;
+            text-align: center;
+        }
+        @media (max-width:991px) {
+           top: 0;
+        }
+    }
+}
+
+
+    

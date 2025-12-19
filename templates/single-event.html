@@ -1,0 +1,36 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Event Details - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="event-v1" class="event-details-page" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/event-banner.html' %}
+
+<!--=========================-->
+<!--=          Event        =-->
+<!--=========================-->
+{% include 'sections/event-details.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

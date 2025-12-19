@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+	<!-- Meta Data -->
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>{% block title %}{{ appInfo.title }}{% endblock %}</title>
+
+	<!-- twitter card starts from here, if you don't need remove this section -->
+	<meta name="twitter:card" content="summary"/>
+	<meta name="twitter:site" content="@yourtwitterusername"/>
+	<meta name="twitter:creator" content="@yourtwitterusername"/>
+	<meta name="twitter:url" content="http://twitter.com"/>
+	<meta name="twitter:title" content="Your home page title, max 140 char"/>
+	<!-- maximum 140 char -->
+	<meta name="twitter:description" content="Your site description, maximum 140 char "/>
+	<!-- maximum 140 char -->
+	<meta name="twitter:image" content="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<!-- when you post this page url in twitter , this image will be shown -->
+	<!-- twitter card ends here -->
+
+	<!-- facebook open graph starts from here, if you don't need then delete open graph related  -->
+	<meta property="og:title" content="Your home page title"/>
+	<meta property="og:url" content="http://your domain here.com"/>
+	<meta property="og:locale" content="en_US"/>
+	<meta property="og:site_name" content="Your site name here"/>
+	<!--meta property="fb:admins" content="" /-->
+	<!-- use this if you have  -->
+	<meta property="og:type" content="website"/>
+	<!-- 'article' for single page  -->
+	<meta property="og:image" content="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<!-- when you post this page url in facebook , this image will be shown -->
+	<!-- facebook open graph ends here -->
+
+	<!-- desktop bookmark -->
+	<meta name="msapplication-TileColor" content="#ffffff"/>
+	<meta name="msapplication-TileImage" content="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<meta name="theme-color" content="#ffffff"/>
+
+	<!-- icons & favicons -->
+	<link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<!-- this icon shows in browser toolbar -->
+	<link rel="icon" type="image/x-icon" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<!-- this icon shows in browser toolbar -->
+	<link rel="apple-touch-icon" sizes="57x57" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="60x60" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="72x72" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="76x76" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="114x114" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="120x120" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="144x144" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="152x152" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="icon" type="image/png" sizes="192x192" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="icon" type="image/png" sizes="96x96" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/logo/iuiuaa.png' %}"/>
+
+	<!-- Dependency Styles -->
+	<link id="style-bundle" rel="stylesheet" href="{% static 'assets/vendors/css/bundle.css' %}" type="text/css"/>
+	
+	<!-- Dependency Styles -->
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/bootstrap/css/bootstrap.min.css' %}" type="text/css"/>
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/fontawesome/css/all.min.css' %}" type="text/css"/>
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/owl-carousel/css/owl.carousel.min.css' %}" type="text/css"/>
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/magnific-popup/magnific-popup.css' %}" type="text/css"/>
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/nice-select/nice-select.css' %}" type="text/css"/>
+	<link class="script-css" rel="stylesheet" href="{% static 'assets/vendors/awesome-notifications/style.css' %}" media="all"/>
+	<!-- Site Stylesheet -->
+	<link id="cbx-style" rel="stylesheet" href="{% static 'assets/css/style-default.css' %}" type="text/css"/>
+	<!-- Google Web Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+		  rel="stylesheet"/>
+
+	{% block header %}{% endblock %}
+</head>
+
+<body {% block attribute %}{% endblock %}>
+<a href="#" class="scroll-top">
+	<i class="fa fa-angle-up"></i>
+</a>
+
+<div id="main_content" class="main-content">
+	{% block content %} {% endblock %}
+</div>
+<!-- /#site -->
+
+{% if custom_data.build_mode %}
+<!-- Dependency Scripts -->
+<script id="script-bundle" src="{% static 'assets/vendors/js/bundle.js' %}"></script>
+{% else %}
+<!-- Dependency Scripts -->
+<script class="script-js" src="{% static 'assets/vendors/jquery/jquery.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/owl-carousel/js/owl.carousel.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/isotope/isotope.pkgd.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/magnific-popup/jquery.magnific-popup.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/jquery-waypoints/jquery.waypoints.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/counterup/jquery.counterup.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/smooth-scroll/jquery.smooth-scroll.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/nice-select/jquery.nice-select.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/countdown/jquery.countdown.min.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/jquery-validate/jquery.validate.js' %}"></script>
+<script class="script-js" src="{% static 'assets/vendors/awesome-notifications/index.var.js' %}"></script>
+{% endif %} {% if custom_data.switcher_off %}
+<script id="color-switcher" src="{% static 'assets/js/switcher.js' %}"></script>
+{% endif %}
+<!-- Site Scripts -->
+<script src="{% static 'assets/js/app.js' %}"></script>
+
+{% block footer %}{% endblock %}
+</body>
+
+</html>

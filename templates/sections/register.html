@@ -1,0 +1,230 @@
+{% load static %}
+<section id="page-content-wrap">
+    <div class="register-page-wrapper section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="register-page-inner">
+                        <div class="col-lg-10 m-auto">
+                            <div class="register-form-content">
+                                <div class="row justify-content-between">
+                                    <!-- Regsiter Form Area Start -->
+                                    <div class="col-lg-7 col-md-6 ml-auto">
+                                        <div class="register-form-wrap">
+                                            <h3>Registration Form</h3>
+                                            
+                                            {% if messages %}
+                                            <div class="alert-messages mb-4">
+                                                {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert">
+                                                        <span>&times;</span>
+                                                    </button>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="register-form">
+                                                <form method="post" novalidate>
+                                                    {% csrf_token %}
+                                                    
+                                                    <!-- Account Information -->
+                                                    <div class="section-title mb-3">
+                                                        <h5 class="border-bottom pb-2">Account Information</h5>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ user_form.full_name.id_for_label }}">Full Name *</label>
+                                                                {{ user_form.full_name }}
+                                                                {% if user_form.full_name.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ user_form.full_name.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ user_form.email.id_for_label }}">Email *</label>
+                                                                {{ user_form.email }}
+                                                                {% if user_form.email.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ user_form.email.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ user_form.password1.id_for_label }}">Password *</label>
+                                                                {{ user_form.password1 }}
+                                                                {% if user_form.password1.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ user_form.password1.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                                <small class="form-text text-muted">At least 8 characters</small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ user_form.password2.id_for_label }}">Confirm Password *</label>
+                                                                {{ user_form.password2 }}
+                                                                {% if user_form.password2.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ user_form.password2.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Academic Information -->
+                                                    <div class="section-title mb-3 mt-4">
+                                                        <h5 class="border-bottom pb-2">Academic Information</h5>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.batch.id_for_label }}">Batch *</label>
+                                                                {{ profile_form.batch }}
+                                                                {% if profile_form.batch.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.batch.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                                <!-- <small class="form-text text-muted">Format: YYYY or YYYY-YYYY</small> -->
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.course.id_for_label }}">Course/Department *</label>
+                                                                {{ profile_form.course }}
+                                                                {% if profile_form.course.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.course.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.graduation_year.id_for_label }}">Graduation Year</label>
+                                                                {{ profile_form.graduation_year }}
+                                                                {% if profile_form.graduation_year.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.graduation_year.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.campus.id_for_label }}">Campus</label>
+                                                                {{ profile_form.campus }}
+                                                                {% if profile_form.campus.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.campus.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Gender Field - BLOCK LAYOUT -->
+                                                    <div class="row mb-3">
+                                                        <div class="col-12">
+                                                            <div class="gender form-group">
+                                                                <label class="g-name d-block mb-2">Gender *</label>
+                                                                <div class="gender-options">
+                                                                    {% for radio in profile_form.gender %}
+                                                                    <div class="custom-control custom-radio mb-2">
+                                                                        {{ radio.tag }}
+                                                                        <label class="custom-control-label" for="{{ radio.id_for_label }}">
+                                                                            {{ radio.choice_label }}
+                                                                        </label>
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                                {% if profile_form.gender.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.gender.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.phone.id_for_label }}">Phone Number</label>
+                                                                {{ profile_form.phone }}
+                                                                {% if profile_form.phone.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.phone.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Terms and Submit -->
+                                                    <div class="form-group mt-4">
+                                                        <!-- <div class="custom-control custom-checkbox float-lg-right">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                   id="terms_agree" name="terms_agree" required>
+                                                            <label class="custom-control-label" for="terms_agree">
+                                                                I have read and agree to the <a href="/terms/">Alumni</a> Terms
+                                                                of Service
+                                                            </label>
+                                                        </div> -->
+                                                        <button type="submit" class="btn btn-reg">Registration</button>
+                                                    </div>
+													<label class="custom-control-label">
+													Already have an account <a href="{% url 'login' %}">Login</a>
+													</label>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Regsiter Form Area End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Optional: Add CSS for block layout -->
+<style>
+    .gender-options .custom-control {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .gender-options .custom-control:last-child {
+        margin-bottom: 0;
+    }
+    
+    .gender-options .custom-control-label {
+        padding-left: 0.5rem;
+    }
+</style>

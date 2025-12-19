@@ -1,0 +1,36 @@
+/*--== Page Title Area Start ==--*/
+#page-title-area {
+	background-image: url(../images/page-title.jpg);
+	background-size: cover;
+	background-position: center center;
+	position: relative;
+	padding: 100px 0;
+	z-index: 1;
+
+	&:after {
+		background-color: $black;
+		content: '';
+		height: 100%;
+		left: 0;
+		top: 0;
+		width: 100%;
+		position: absolute;
+		@include opacity(0.8);
+		z-index: -1;
+	}
+
+	.page-title-content {
+		color: $white;
+
+		h1 {
+			line-height: 1;
+			margin-bottom: 15px;
+		}
+
+		.btn-brand {
+			@include transition(0.4s);
+			padding: 12px 55px;
+			margin-top: 15px;
+		}
+	}
+}

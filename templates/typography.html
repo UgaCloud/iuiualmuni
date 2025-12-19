@@ -1,0 +1,36 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Typography - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="typography-v1" class="tupography-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/register-banner.html' %}
+
+<!--=============================-->
+<!--=         Typography        =-->
+<!--=============================-->
+{% include 'sections/typography.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

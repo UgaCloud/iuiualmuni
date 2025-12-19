@@ -1,0 +1,36 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Blog - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="blog-page-v1" class="blog-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/blog-banner.html' %}
+
+<!--==================================-->
+<!--=         Blog        =-->
+<!--==================================-->
+{% include 'sections/blog-list.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

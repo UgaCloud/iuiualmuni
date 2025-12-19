@@ -1,0 +1,251 @@
+#gallery-area {
+	background-color: $section-bg;
+}
+
+.gallery-menu {
+	margin-bottom: 60px;
+
+	span {
+		background-color: $light-blue;
+		cursor: pointer;
+		color: $title-color;
+		@include font-weight(500);
+		text-transform: capitalize;
+		display: inline-block;
+		padding: 15px 35px;
+		@include transition();
+		margin-right: 25px;
+
+		&:hover {
+			background-color: $brand-color;
+			color: $white;
+		}
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	span.active {
+		background-color: $brand-color;
+		color: $white;
+	}
+
+	a {
+		background-color: $light-blue;
+		cursor: pointer;
+		color: $title-color;
+		@include font-weight(500);
+		text-transform: capitalize;
+		display: inline-block;
+		padding: 15px 35px;
+		@include transition();
+		margin-right: 25px;
+
+		&:hover {
+			background-color: $brand-color;
+			color: $white;
+		}
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	a.active {
+		background-color: $brand-color;
+		color: $white;
+	}
+}
+
+.gallery-gird {
+	margin-top: -30px;
+
+	.col-lg-3 {
+		.single-gallery-item {
+			background-size: cover;
+			background-position: center center;
+			background-repeat: no-repeat;
+			margin-top: 15px;
+			height: 250px;
+			position: relative;
+			@include transition(0.4s);
+			overflow: hidden;
+
+			img {
+				max-height: 315px;
+				min-width: 100%;
+			}
+
+			.gallery-hvr-wrap {
+				background-color: $brand-color;
+				width: 100%;
+				position: absolute;
+				height: 100%;
+				top: 0;
+				left: 0;
+				color: $white;
+				opacity: 0;
+				visibility: hidden;
+				@include transition(0.4s);
+
+				.gallery-hvr-text {
+					position: absolute;
+					left: 25px;
+					bottom: -55px;
+					opacity: 0;
+					visibility: hidden;
+					@include transition(0.4s);
+
+					h4 {
+						@include font-size(18);
+						@include font-weight(700);
+					}
+
+					.gallery-event-date {
+						@include font-size(14);
+						@include font-weight(700);
+						line-height: 1;
+					}
+				}
+
+				.btn-zoom {
+					width: 70px;
+					height: 65px;
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					margin: auto;
+					display: block;
+					transform: scale(0);
+					@include transition(0.4s);
+
+					img {
+						margin-top: -25px;
+					}
+				}
+			}
+
+			&:hover .gallery-hvr-wrap {
+				opacity: 0.9;
+				visibility: visible;
+			}
+
+			&:hover .gallery-hvr-text {
+				opacity: 1;
+				visibility: visible;
+				bottom: 15px;
+			}
+
+			&:hover .btn-zoom {
+				transform: scale(1);
+			}
+		}
+
+		.video {
+			.btn-video-play {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%) scale(1);
+			}
+		}
+
+		&:nth-child(1) .single-gallery-item,
+		&:nth-child(4) .single-gallery-item,
+		&:nth-child(5) .single-gallery-item {
+			height: 315px;
+		}
+	}
+
+	.gallery-bg-1 {
+		background-image: url(../images/gallery/gellary-img-1.jpg);
+	}
+
+	.gallery-bg-2 {
+		background-image: url(../images/gallery/gellary-img-2.jpg);
+	}
+
+	.gallery-bg-3 {
+		background-image: url(../images/gallery/gellary-img-3.jpg);
+	}
+
+	.gallery-bg-4 {
+		background-image: url(../images/gallery/gellary-img-4.jpg);
+	}
+
+	.gallery-bg-5 {
+		background-image: url(../images/gallery/gellary-img-5.jpg);
+	}
+
+	.gallery-bg-6 {
+		background-image: url(../images/gallery/gellary-img-6.jpg);
+	}
+
+	.gallery-bg-7 {
+		background-image: url(../images/gallery/gellary-img-7.jpg);
+	}
+
+	.gallery-bg-8 {
+		background-image: url(../images/gallery/gellary-img-8.jpg);
+	}
+}
+
+
+// Gallery Page
+.gallery-page-wrap {
+	background-color: $section-bg;
+
+	.gallery-menu {
+		border-bottom: 5px solid $brand-color;
+	}
+
+	.single-album-wraper {
+		margin-bottom: 150px;
+
+		.album-heading {
+			position: relative;
+			margin-bottom: 90px;
+
+			h2 {
+				@include font-size(48);
+				@include font-weight(100);
+				display: inline-block;
+				position: relative;
+				margin-bottom: 30px;
+				line-height: 1.5;
+
+				&:after {
+					background-color: #161F37;
+					content: '';
+					left: 0;
+					height: 2px;
+					position: absolute;
+					width: calc(100% - 25px);
+					bottom: 0;
+				}
+
+				a {
+					color: $title-color;
+				}
+			}
+
+			a.btn-brand {
+				text-transform: capitalize;
+				@include font-weight(400);
+				position: absolute;
+				right: 0;
+				top: 15px;
+
+				&:hover,
+				&:focus {
+					background-color: $brand-color-light;
+					color: $white;
+				}
+			}
+		}
+	}
+}

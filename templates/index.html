@@ -1,0 +1,78 @@
+{% extends 'layouts/app.html' %}
+
+{# Page Title #}
+{% block title %} Home - {{ appInfo.name }}{% endblock %}
+
+
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="home-v1" class="home-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/banner.html' %}
+
+<!--=================================-->
+<!--=         Upcoming Event        =-->
+<!--=================================-->
+{% include 'sections/upcoming.html' %}
+
+<!--=========================-->
+<!--=         About         =-->
+<!--=========================-->
+{% include 'sections/about.html' %}
+
+<!--=================================-->
+<!--=         Responsibility        =-->
+<!--=================================-->
+{% include 'sections/responsibility.html' %}
+
+<!--================================-->
+<!--=         Fun Fact        =-->
+<!--================================-->
+{% include 'sections/fun-fact.html' %}
+
+<!--======================-->
+<!--=         Job        =-->
+<!--======================-->
+
+
+<!--==========================-->
+<!--=         Gallery        =-->
+<!--==========================-->
+<!--  -->
+
+<!--=================================-->
+<!--=         Call To Action        =-->
+<!--=================================-->
+{% include 'sections/call-to-action.html' %}
+
+<!--=======================-->
+<!--=         Blog        =-->
+<!--=======================-->
+{% include 'sections/blog.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}
+
+
+
+{% include 'sections/gallery.html' %}
+{% include 'sections/job.html' %}

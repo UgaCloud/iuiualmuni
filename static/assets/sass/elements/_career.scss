@@ -1,0 +1,28 @@
+.career-page-wrapper {
+	.career-page-topbg {
+		background-color: $brand-color;
+		padding: 20px 0;
+
+		img {
+			width: 80%;
+			margin: auto;
+			display: block;
+		}
+	}
+
+	.career-page-content-wrap {
+		background-color: $section-bg;
+
+		.job-opportunity-wrapper {
+			margin-top: -30px;
+		}
+
+		.single-job-opportunity {
+			background-color: $white;
+		}
+
+		.event-filter-area {
+			margin-bottom: 100px;
+		}
+	}
+}

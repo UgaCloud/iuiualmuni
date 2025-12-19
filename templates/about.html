@@ -1,0 +1,50 @@
+{% extends 'layouts/app.html' %}
+{% load static %}
+{# Page Title #}
+{% block title %} About - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="about-v1" class="aboute-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% static 'assets/css/about.css' %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/about-banner.html' %}
+
+<!--=================================-->
+<!--=         Upcoming Event        =-->
+<!--=================================-->
+{% include 'sections/about-page.html' %}
+
+<!--=========================-->
+<!--=         Fun fact        =-->
+<!--==========================-->
+{% include 'sections/fun-fact.html' %}
+
+<!--===========================-->
+<!--=         Committee       =-->
+<!--===========================-->
+{% include 'sections/association_heads.html' %}
+
+<!--=============================-->
+<!--=         Testimonial       =-->
+<!--=============================-->
+{% include 'sections/testimonial.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+{% endblock %}

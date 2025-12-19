@@ -1,0 +1,29 @@
+{% load static %}
+<section id="about-area" class="section-padding">
+    <div class="about-area-wrapper">
+        <div class="container">
+            <div class="row justify-content-end">
+                <div class="col-lg-10">
+                    <div class="about-content-wrap">
+                        <div class="section-title text-lg-left">
+                            <h2>Our Mission</h2>
+                        </div>
+
+                        <div class="about-thumb mb-4">
+                            <img src="{% static 'assets/images/celebrate.jpg' %}" alt="IUIU Alumni Mission" class="img-fluid">
+                        </div>
+
+                        <p>
+                            Our mission is to unite IUIU alumni into a strong, values-driven community that promotes lifelong connections, supports student success, advances social welfare, and contributes positively to national and global development through service, mentorship, and knowledge sharing.
+                        </p>
+                        <p>
+                            We achieve this by implementing initiatives such as the Ramadhan Package Drive, Scholarships Initiative, Free Medical Camps, Mentorship & Knowledge Sharing Programs, Alumni Online Insight Series, Welfare – Back to School Program, and hosting our Annual Dinner. Each program strengthens alumni engagement and impacts students, families, and communities.
+                        </p>
+
+                        <a href="{% url 'about' %}" class="btn btn-brand about-btn">Know More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

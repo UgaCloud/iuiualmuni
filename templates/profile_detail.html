@@ -1,0 +1,39 @@
+{% extends 'layouts/app.html' %}
+{% load static %}
+
+{# Page Title #}
+{% block title %} Members - {{ appInfo.name }}{% endblock %}
+
+{# Custom Code In Head #}
+{% block header %}{% endblock %}
+
+{# ID, Class or Attribute in body tag #} {% block attribute %}id="commitee-v1" class="committee-page-one" data-style="default"{% endblock %}
+
+{# Custom Code In Footer #}
+{% block head %}{% endblock %}
+
+{% block content %}
+
+<!--=========================-->
+<!--=        Navbar         =-->
+<!--=========================-->
+{% include 'shared/navbar.html' %}
+
+<!--==========================-->
+<!--=         Banner         =-->
+<!--==========================-->
+{% include 'shared/member-banner.html' %}
+
+<!--=================================-->
+<!--=         Upcoming Event        =-->
+<!--=================================-->
+
+
+{% include 'sections/profile_detail.html' %}
+
+<!--=========================-->
+<!--=        Footer         =-->
+<!--=========================-->
+{% include 'shared/footer.html' %}
+
+{% endblock %}

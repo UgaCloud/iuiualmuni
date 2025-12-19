@@ -1,0 +1,121 @@
+{% load static %}
+<section class="blog-slider">
+	<div class="container">
+		<div class="section-title-ana wow gptFadeUp">
+			<h2>Thoughts & Experiments</h2>
+		</div>
+		<!-- /.section-title-ana -->
+
+		<div class="blog-wrapper">
+			<div
+				class="swiper-container  wow gptFadeUp"
+				data-wow-delay="0.3s"
+				id="blog-slider"
+				data-space="30"
+				data-breakpoints='{"1024": {"slidesPerView": 3}, "576": {"slidesPerView": 2}, "320": {"slidesPerView": 1}}'>
+
+				<div class="swiper-wrapper">
+
+					<div class="swiper-slide">
+						<div class="blog-slider-post">
+							<div class="feature-image">
+								<a href="blog-single.html">
+									<img src="{% static 'assets/images/blog/1.jpg' %}" alt="blog"></a>
+							</div>
+
+							<div class="blog-content">
+								<ul class="post-meta">
+									<li>
+										<i class="icon-user icons"></i>By:
+										<a href="blog-single.html">Jake Weary</a>
+									</li>
+									<li>
+										<i class="icon-clock icons"></i>
+										<a href="blog-single.html">July 24, 2021</a>
+									</li>
+								</ul>
+								<h3>
+									<a href="blog-single.html">Astriol Summit 2020 Summary</a>
+								</h3>
+
+								<p>
+									Mush Harry is cheeky bugger bugger all mate so I said blatant.
+								</p>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="swiper-slide">
+						<div class="blog-slider-post">
+							<div class="feature-image">
+								<a href="blog-single.html">
+									<img src="{% static 'assets/images/blog/2.jpg' %}" alt="blog"></a>
+							</div>
+
+							<div class="blog-content">
+								<ul class="post-meta">
+									<li>
+										<i class="icon-user icons"></i>By:
+										<a href="blog-single.html">Jake Weary</a>
+									</li>
+									<li>
+										<i class="icon-clock icons"></i>
+										<a href="blog-single.html">July 24, 2021</a>
+									</li>
+								</ul>
+								<h3>
+									<a href="blog-single.html">Your refreshed archives just landed</a>
+								</h3>
+
+								<p>
+									Mush Harry is cheeky bugger bugger all mate so I said blatant.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="swiper-slide">
+						<div class="blog-slider-post">
+							<div class="feature-image">
+								<a href="blog-single.html">
+									<img src="{% static 'assets/images/blog/3.jpg' %}" alt="blog"></a>
+							</div>
+
+							<div class="blog-content">
+								<ul class="post-meta">
+									<li>
+										<i class="icon-user icons"></i>By:
+										<a href="blog-single.html">Jake Weary</a>
+									</li>
+									<li>
+										<i class="icon-clock icons"></i>
+										<a href="blog-single.html">July 24, 2021</a>
+									</li>
+								</ul>
+								<h3>
+									<a href="blog-single.html">How to build a Astriol in few simple steps</a>
+								</h3>
+
+								<p>
+									Mush Harry is cheeky bugger bugger all mate so I said blatant.
+								</p>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="slider-pagi-inner pg-dark">
+					<div class="swiper-pagination" id="blog-pagination"></div>
+				</div>
+				<!-- /.slider-pagi-inner -->
+
+			</div>
+		</div>
+		<!-- /.blog-wrapper -->
+
+	</div>
+	<!-- /.container -->
+</section>
+<!-- /.blog-slider -->

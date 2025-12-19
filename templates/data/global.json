@@ -1,0 +1,26 @@
+{
+	"appInfo": {
+		"name": "University Alumni Html Template",
+		"title": "Static Build System - a great frontend task manager.",
+		"id": "codeboxr-build-system",
+		"desc": "A great front-end build system with gulp, sass and nunjucks.",
+		"author": "Codrboxr",
+		"version": "1.2.1"
+	},
+	"socialLinks": [{
+			"id": "twitter",
+			"title": "Twitter",
+			"url": "#twitter"
+		},
+		{
+			"id": "facebook",
+			"title": "Facebook",
+			"url": "#facebook"
+		},
+		{
+			"id": "instagram",
+			"title": "Instagram",
+			"url": "#instagram"
+		}
+	]
+}

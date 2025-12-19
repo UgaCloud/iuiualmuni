@@ -1,0 +1,126 @@
+/* Register Page Css */
+.register-page-inner {
+	@include box-shadow(0 3px 30px 0 rgba(0, 0, 0, .1));
+	padding: 60px 0 50px;
+}
+
+.register-form-content {
+	.signin-area-wrap {
+		h4 {
+			@include font-size(24);
+			line-height: 1;
+			color: $title-color;
+			margin-bottom: 30px;
+		}
+
+		.sign-form {
+			input {
+				width: 100%;
+				display: block;
+				text-align: center;
+				background-color: $section-bg;
+				border: 1px solid $brand-color-dark;
+				color: $darkmeta;
+				padding: 12px 15px;
+				margin-bottom: 15px;
+				@include transition(0.4s);
+
+				&:focus {
+					outline: none;
+				}
+			}
+
+			.btn-reg {
+				width: 100%;
+				padding: 15px 20px;
+				margin-top: 20px;
+			}
+		}
+	}
+
+	.register-form-wrap {
+		position: relative;
+
+		h3 {
+			@include font-size(24);
+			line-height: 1;
+			text-transform: uppercase;
+			@include font-weight(700);
+			color: $title-color;
+			margin-bottom: 35px;
+		}
+
+		.file-input {
+			margin: 20px 0 25px;
+
+			.custom-file {
+				background-color: $light-blue;
+				@include font-size(12);
+				line-height: 1;
+				padding: 15px 25px;
+				border: 1px solid $darkmeta;
+				width: auto;
+				cursor: pointer;
+
+				i.fa {
+					margin-right: 5px;
+				}
+			}
+		}
+
+		&:before {
+			background-color: $brand-color;
+			content: '';
+			width: 3px;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: -55px;
+		}
+
+		.gender {
+			margin-bottom: 25px;
+		}
+	}
+}
+
+.form-group {
+	margin-bottom: 15px;
+
+	label {
+		@include font-size(14);
+		line-height: 1;
+		color: $black;
+		@include font-weight(500);
+	}
+
+	.form-control {
+		padding: 10px 15px;
+		@include rounded(0);
+		@include font-size(14);
+		line-height: 1;
+
+		&.error {
+			border-color: #e74c3c;
+		}
+		
+
+		&:focus {
+			outline: none;
+			border-color: $brand-color-dark;
+			box-shadow: none;
+		}
+	}
+
+	.custom-checkbox {
+		margin-left: 30px;
+		margin-top: 10px;
+
+		label {
+			padding-left: 5px;
+			@include font-size(12);
+			line-height: 1.2;
+			color: $halka;
+		}
+	}
+}

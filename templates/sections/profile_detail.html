@@ -1,0 +1,316 @@
+{% load static %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Header Card -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <!-- Profile Photo -->
+                        <div class="col-md-3 text-center mb-4 mb-md-0">
+                            <div class="position-relative">
+                                {% if profile.photo %}
+                                    <img src="{{ profile.photo.url }}" 
+                                         class="img-fluid rounded-circle border border-4 border-white shadow" 
+                                         alt="{{ profile.user.full_name }}"
+                                         style="width: 200px; height: 200px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'assets/images/committee/commitee-1.jpg' %}" 
+                                         class="img-fluid rounded-circle border border-4 border-white shadow" 
+                                         alt="{{ profile.user.full_name }}"
+                                         style="width: 200px; height: 200px; object-fit: cover;">
+                                {% endif %}
+                              
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Header Info -->
+                        <div class="col-md-9">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h1 class="h2 mb-1 fw-bold">{{ profile.user.full_name }}</h1>
+                                    {% if profile.current_job and profile.current_company %}
+                                    <p class="lead text-muted mb-2">
+                                        <i class="fas fa-briefcase me-2" style="color: #198754;"></i>
+                                        {{ profile.current_job }} at {{ profile.current_company }}
+                                    </p>
+                                    {% elif profile.current_job %}
+                                    <p class="lead text-muted mb-2">
+                                        <i class="fas fa-briefcase me-2" style="color: #198754;"></i>
+                                        {{ profile.current_job }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                   
+                                        {% if profile.user.is_student %}
+                                        <span class="badge bg-success"><i class="fas fa-graduation-cap me-1"></i>Student</span>
+                                        {% endif %}
+                                        {% if profile.user.is_alumni %}
+                                        <span class="badge bg-warning text-dark">Alumni</span>
+                                        {% endif %}
+                                        {% if profile.user.is_admin %}
+                                        <span class="badge bg-danger"><i class="fas fa-user "></i> Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                
+
+                                   <!-- Back to Members Link -->
+                                    <div class="text-center">
+                                        <a href="{% url 'members' %}" class="btn-lg btn btn-outline-success">
+                                            <i class="fas fa-arrow-left me-2"></i> Back to Members
+                                        </a>
+                                        <!-- Edit Button (for profile owner) -->
+                                        {% if user.is_authenticated and user.id == profile.user.id %}
+                                        <a href="" class="btn btn-outline-success btn-lg">
+                                            <i class="fas fa-edit me-1"></i> Edit Profile
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- About Section -->
+            {% if profile.bio %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-user-circle me-2" style="color: #198754;"></i> About
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ profile.bio|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Academic Information - Two Column Table Layout -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-graduation-cap me-2" style="color: #198754;"></i> Academic Information
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted" style="width: 40%; padding-left: 2rem;">Student ID</td>
+                                    <td class="fw-bold">{{ profile.student_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Email Address</td>
+                                    <td class="fw-bold">
+                                        <a href="mailto:{{ profile.email }}" class="text-decoration-none text-success">
+                                            {{ profile.email }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Department/Course</td>
+                                    <td class="fw-bold">{{ profile.Course|default:"Not Specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Batch Year</td>
+                                    <td class="fw-bold">{{ profile.batch }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Campus</td>
+                                    <td class="fw-bold">{{ profile.campus_name }}</td>
+                                </tr>
+                                {% if profile.graduation_year %}
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Graduation Year</td>
+                                    <td class="fw-bold">{{ profile.graduation_year }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professional Information - Two Column Table Layout -->
+            {% if profile.current_job or profile.current_company %}
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-briefcase me-2" style="color: #198754;"></i> Professional Information
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                {% if profile.current_job %}
+                                <tr>
+                                    <td class="text-muted" style="width: 40%; padding-left: 2rem;">Current Position</td>
+                                    <td class="fw-bold">{{ profile.current_job }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if profile.current_company %}
+                                <tr>
+                                    <td class="text-muted" style="padding-left: 2rem;">Company/Organization</td>
+                                    <td class="fw-bold">{{ profile.current_company }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Contact Information -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-address-card me-2" style="color: #198754;"></i> Contact Information
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if profile.phone %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle p-2 me-3" style="background-color: #e8f5e9;">
+                            <i class="fas fa-phone" style="color: #198754;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Phone</h6>
+                            <p class="mb-0 fw-bold">{{ profile.phone }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile.address %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle p-2 me-3" style="background-color: #e8f5e9;">
+                            <i class="fas fa-map-marker-alt" style="color: #198754;"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Address</h6>
+                            <p class="mb-0 fw-bold">{{ profile.address|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Social Links -->
+                    {% if profile.linkedin_url or profile.github_url or profile.portfolio_url %}
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Connect</h6>
+                        <div class="d-flex gap-2">
+                            {% if profile.linkedin_url %}
+                            <a href="{{ profile.linkedin_url }}" target="_blank" 
+                               class="btn btn-outline-success btn-sm rounded-circle"
+                               data-bs-toggle="tooltip" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if profile.github_url %}
+                            <a href="{{ profile.github_url }}" target="_blank" 
+                               class="btn btn-outline-success btn-sm rounded-circle"
+                               data-bs-toggle="tooltip" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% if profile.portfolio_url %}
+                            <a href="{{ profile.portfolio_url }}" target="_blank" 
+                               class="btn btn-outline-success btn-sm rounded-circle"
+                               data-bs-toggle="tooltip" title="Portfolio">
+                                <i class="fas fa-globe"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Profile Status -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-chart-bar me-2" style="color: #198754;"></i> Profile Status
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">Account Created:</span>
+                            <span class="fw-bold">{{ profile.user.date_joined|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span class="text-muted">Last Updated:</span>
+                            <span class="fw-bold">{{ profile.updated_at|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-eye me-2 {% if profile.is_public %}text-success{% else %}text-secondary{% endif %}"></i>
+                            <span class="text-muted">Profile Visibility:</span>
+                            <span class="fw-bold {% if profile.is_public %}text-success{% else %}text-secondary{% endif %}">
+                                {{ profile.is_public|yesno:"Public,Private" }}
+                            </span>
+                        </li>
+                      
+                    </ul>
+                </div>
+            </div>
+            
+         
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for green theme -->
+<style>
+    .text-success, .btn-success {
+        color: #198754 !important;
+    }
+    
+    .btn-outline-success {
+        color: #198754;
+        border-color: #198754;
+    }
+    
+    .btn-outline-success:hover {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .badge.bg-success {
+        background-color: #198754 !important;
+    }
+    
+    a.text-decoration-none.text-success:hover {
+        color: #146c43 !important;
+        text-decoration: underline !important;
+    }
+</style>
+
+<!-- Add Font Awesome for icons (if not already included) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- JavaScript for tooltips -->
+<script>
+    // Initialize Bootstrap tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
