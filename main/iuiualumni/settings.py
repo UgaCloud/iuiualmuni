@@ -71,7 +71,7 @@ WSGI_APPLICATION = 'iuiualumni.wsgi.application'
 # ---------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': 'iuiuaaor_iuiuaa_sitedb',       # Your cPanel DB name
         'USER': 'iuiuaaor_site',         # Your cPanel DB user
         'PASSWORD': 'iuiuAlumni123!',      # Your cPanel DB password

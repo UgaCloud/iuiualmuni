@@ -2,6 +2,7 @@ asgiref
 Django
 django-jazzmin
 mysqlclient
+pymysql
 pillow
 sqlparse
 
