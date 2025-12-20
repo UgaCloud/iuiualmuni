@@ -76,7 +76,7 @@ def register(request):
                     request,
                     f'Registration successful! Welcome, {user.get_short_name()}!'
                 )
-                return redirect('home')  # Change to your home page URL name
+                return redirect('members') 
                 
             except Exception as e:
                 messages.error(

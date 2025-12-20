@@ -3832,7 +3832,7 @@ blockquote:before,
 #about-area .about-area-wrapper .about-content-wrap {
   background-color: #ecf1f5;
   border: 10px solid #dbe5f3;
-  padding: 36px 10px 40px 260px;
+  padding: 36px 10px 40px 260px ;
 }
 
 #about-area .about-area-wrapper .about-content-wrap .about-thumb {
@@ -3853,7 +3853,7 @@ blockquote:before,
 }
 
 #about-area .about-area-wrapper:before {
-  background-image: url("https://via.placeholder.com/1440x1018");
+  background-image: url("../images/blog/dinner.jpg");
   background-size: cover;
   content: "";
   position: absolute;
