@@ -20,7 +20,7 @@ ALLOWED_HOSTS = ['iuiuaa.org', 'www.iuiuaa.org']
 # Installed apps
 # ---------------------------
 INSTALLED_APPS = [
-    'jazzmin',
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
