@@ -106,15 +106,19 @@ USE_TZ = True
 # ---------------------------
 # Static files
 # ---------------------------
-STATIC_URL = '/static/'
+STATIC_URL = '/main/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic target
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # ---------------------------
 # Media files
 # ---------------------------
-MEDIA_URL = '/media/'
+MEDIA_URL = '/main/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
 
 # ---------------------------
 # Default primary key field
