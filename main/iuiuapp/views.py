@@ -2,20 +2,22 @@ from django.http import request
 from django.shortcuts import *
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.views import View
 from .models import *
 from django.utils import timezone
-
 from django.core.paginator import *
 from django.db.models import Q
-
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
-
 from django.db import transaction
 from .forms import *
+
+
+
+
+
 
 
 
@@ -25,69 +27,44 @@ from .forms import *
 def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
-        profile_form = ProfileRegistrationForm(request.POST)
+        profile_form = ProfileRegistrationForm(request.POST, request.FILES)
         
         if user_form.is_valid() and profile_form.is_valid():
             try:
                 with transaction.atomic():
-                    # Save user first
-                    user = user_form.save(commit=False)
-                    user.is_active = True
-                    user.is_verified = False
-                    user.save()
+                    member = Member.objects.create(
+                        full_name=user_form.cleaned_data['full_name'],
+                        email=user_form.cleaned_data['email'],
+                        batch=user_form.cleaned_data['batch'],
+                        course=user_form.cleaned_data['course'],
+                        phone=user_form.cleaned_data.get('phone', ''),
+                        graduation_year=user_form.cleaned_data.get('graduation_year')
+                    )
                     
-                    # Save profile with user reference
                     profile = profile_form.save(commit=False)
-                    profile.user = user
+                    profile.member = member
                     profile.save()
                     
-                    # Assign default role automatically (handled in Profile.save())
-                    
-                    # Create audit log entry
                     AuditLog.objects.create(
-                        user=user,
-                        action='REGISTER',
+                        member=member,
+                        action='MEMBER_CREATE',
                         details={
-                            'email': user.email,
-                            'full_name': user.full_name,
-                            'batch': profile.batch,
-                            'gender': profile.gender,
+                            'email': member.email,
+                            'full_name': member.full_name,
+                            'batch': member.batch,
                         },
                         ip_address=request.META.get('REMOTE_ADDR'),
                         user_agent=request.META.get('HTTP_USER_AGENT', '')
                     )
                 
-                # Auto-login the user after successful registration
-                auth_login(request, user)
-                
-                # Create audit log for auto-login
-                AuditLog.objects.create(
-                    user=user,
-                    action='LOGIN',
-                    details={
-                        'source': 'registration_auto_login',
-                        'method': 'auto',
-                    },
-                    ip_address=request.META.get('REMOTE_ADDR'),
-                    user_agent=request.META.get('HTTP_USER_AGENT', '')
-                )
-                
-                messages.success(
-                    request,
-                    f'Registration successful! Welcome, {user.get_short_name()}!'
-                )
+                messages.success(request, 'Registration successful! You are now a member.')
+                messages.info(request, 'The admin will review your registration.')
                 return redirect('members') 
                 
             except Exception as e:
-                messages.error(
-                    request,
-                    f'Registration failed: {str(e)}. Please try again.'
-                )
+                messages.error(request, f'Registration failed: {str(e)}')
         else:
-            messages.error(
-                request,
-                'Please correct the errors below.'
-            )
+            messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserRegistrationForm()
         profile_form = ProfileRegistrationForm()
@@ -100,46 +77,45 @@ def register(request):
     return render(request, 'register.html', context)
 
 class LoginView(View):
-    """User login view using email and password"""
-    
     def get(self, request):
-        # If user is already logged in, redirect to dashboard
         if request.user.is_authenticated:
             return redirect('home')
-        
         return render(request, 'login.html')
     
     def post(self, request):
-        # IMPORTANT: Use the correct field names from your form
-        email = request.POST.get('register_email')  # Changed from 'email'
-        password = request.POST.get('register_password')  # Changed from 'password'
-        remember_me = request.POST.get('customCheck1')  # Changed from 'remember_me'
+        email = request.POST.get('register_email')
+        password = request.POST.get('register_password')
+        remember_me = request.POST.get('customCheck1')
         
-        # Basic validation
         if not email or not password:
             messages.error(request, 'Please provide both email and password.')
             return render(request, 'login.html')
         
-        # Authenticate user using email
         user = authenticate(request, email=email, password=password)
         
         if user is not None:
-            # Check if user is active
             if user.is_active:
-                # Login the user
                 auth_login(request, user)
                 
-                # Handle remember me (set session expiry)
                 if remember_me:
-                    # Set session to last 2 weeks
-                    request.session.set_expiry(1209600)  # 2 weeks in seconds
+                    request.session.set_expiry(1209600)
                 else:
-                    # Session expires when browser closes
                     request.session.set_expiry(0)
                 
-                messages.success(request, f'Welcome back, {user.full_name}!')
+                if hasattr(user, 'member'):
+                    AuditLog.objects.create(
+                        user=user,
+                        member=user.member,
+                        action='LOGIN',
+                        details={
+                            'source': 'manual_login',
+                            'method': 'email_password',
+                        },
+                        ip_address=request.META.get('REMOTE_ADDR'),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
                 
-                # Redirect to next page or dashboard
+                messages.success(request, f'Welcome back, {user.full_name}!')
                 next_url = request.GET.get('next', 'home')
                 return redirect(next_url)
             else:
@@ -149,30 +125,51 @@ class LoginView(View):
         
         return render(request, 'login.html')
 
-
 class LogoutView(View):
-    """User logout view"""
-    
     def get(self, request):
+        if request.user.is_authenticated and hasattr(request.user, 'member'):
+            AuditLog.objects.create(
+                user=request.user,
+                member=request.user.member,
+                action='LOGOUT',
+                details={'source': 'manual_logout'},
+                ip_address=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+        
         logout(request)
         messages.success(request, 'You have been logged out successfully.')
         return redirect('login')
 
-
 class ProfileDetailView(DetailView):
-    """View for individual profile details"""
     model = Profile
     template_name = 'profile_detail.html'
     context_object_name = 'profile'
     
     def get_object(self):
         return get_object_or_404(
-            Profile.objects.select_related('user', 'campus').prefetch_related('user__roles'),
+            Profile.objects.select_related('member', 'campus'),
             id=self.kwargs['pk'],
             is_public=True
         )
-
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = context['profile']
+        
+        if hasattr(profile.member, 'user_account'):
+            user = profile.member.user_account
+            context['is_association_leader'] = user.is_association_leader
+            context['current_leadership'] = user.current_leadership_assignment
+            context['leadership_history'] = user.leadership_history[:5]
+            context['active_committees'] = user.active_committees
+        else:
+            context['is_association_leader'] = False
+            context['current_leadership'] = None
+            context['leadership_history'] = []
+            context['active_committees'] = []
+        
+        return context
 
 def association_heads_view(request):
     """
@@ -183,34 +180,41 @@ def association_heads_view(request):
     active_leadership = AssociationLeadership.objects.filter(
         is_active=True
     ).select_related(
-        'user__profile',
+        'user__member__profile',
         'position'
     ).order_by('position__order')
     
-    # Get the users from these leadership assignments
-    leader_users = [assignment.user for assignment in active_leadership]
+    # Create a list of tuples with leader and profile
+    leaders_with_profiles = []
+    for leader in active_leadership:
+        # Get the profile for this leader's member
+        try:
+            profile = Profile.objects.get(member=leader.user.member, is_public=True)
+        except Profile.DoesNotExist:
+            profile = None
+        
+        leaders_with_profiles.append({
+            'leader': leader,
+            'profile': profile
+        })
     
-    # Get profiles of these leaders
-    profiles = Profile.objects.filter(
-        user__in=leader_users,
-        is_public=True
-    ).select_related('user', 'campus')
+    paginator = Paginator(leaders_with_profiles, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     context = {
-        'leaders': active_leadership,
-        'profiles': profiles,
+        'page_obj': page_obj,
         'page_title': 'Association Leadership',
     }
     
     return render(request, 'association_heads.html', context)
 
+
+
+
+
+
 def committee_heads_view(request):
-    """
-    View for displaying committee heads/leaders
-    Separate from association leadership
-    """
-    # Get committee heads (you can define what makes someone a committee head)
-    # For example: people with specific roles in committees
     committee_heads = CommitteeMembership.objects.filter(
         Q(role__icontains='chair') | 
         Q(role__icontains='coordinator') |
@@ -218,11 +222,10 @@ def committee_heads_view(request):
         Q(role__icontains='lead'),
         is_active=True
     ).select_related(
-        'user__profile',
+        'user__member__profile',
         'committee'
     ).order_by('committee__order', 'user__full_name')
     
-    # Get unique users to avoid duplicates
     seen_users = set()
     unique_committee_heads = []
     for head in committee_heads:
@@ -230,12 +233,11 @@ def committee_heads_view(request):
             unique_committee_heads.append(head)
             seen_users.add(head.user.id)
     
-    # Get their profiles
-    head_users = [head.user for head in unique_committee_heads]
+    head_members = [head.user.member for head in unique_committee_heads]
     profiles = Profile.objects.filter(
-        user__in=head_users,
+        member__in=head_members,
         is_public=True
-    ).select_related('user', 'campus')
+    ).select_related('member', 'campus')
     
     context = {
         'committee_heads': unique_committee_heads,
@@ -246,32 +248,31 @@ def committee_heads_view(request):
     return render(request, 'committee_heads.html', context)
 
 def regular_members_view(request):
-    """
-    View for displaying ONLY regular members (not association or committee heads)
-    """
-    # Get all association leaders
-    association_leader_ids = AssociationLeadership.objects.filter(
+    association_leader_user_ids = AssociationLeadership.objects.filter(
         is_active=True
     ).values_list('user_id', flat=True)
     
-    # Get all active committee members (potential committee heads)
-    active_committee_members = CommitteeMembership.objects.filter(
+    active_committee_user_ids = CommitteeMembership.objects.filter(
         is_active=True
     ).values_list('user_id', flat=True).distinct()
     
-    # Combine both to exclude
-    excluded_user_ids = set(list(association_leader_ids) + list(active_committee_members))
+    excluded_user_ids = set(list(association_leader_user_ids) + list(active_committee_user_ids))
     
-    # Get profiles of users who are NOT leaders or committee members
-    # and have public profiles
+    excluded_member_ids = []
+    for user_id in excluded_user_ids:
+        try:
+            user = User.objects.get(id=user_id)
+            excluded_member_ids.append(user.member.id)
+        except User.DoesNotExist:
+            pass
+    
     profiles_list = Profile.objects.filter(
         is_public=True
     ).exclude(
-        user_id__in=excluded_user_ids
-    ).select_related('user', 'campus').order_by('user__full_name')
+        member_id__in=excluded_member_ids
+    ).select_related('member', 'campus').order_by('member__full_name')
     
-    # Pagination
-    paginator = Paginator(profiles_list, 8)  # 8 items per page
+    paginator = Paginator(profiles_list, 8)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -284,35 +285,32 @@ def regular_members_view(request):
     return render(request, 'members.html', context)
 
 def all_members_directory_view(request):
-    """
-    View for displaying ALL members with filtering options
-    """
-    # Get all public profiles
     profiles_list = Profile.objects.filter(
         is_public=True
-    ).select_related('user', 'campus').order_by('user__full_name')
+    ).select_related('member', 'campus').order_by('member__full_name')
     
-    # Apply filters if provided
     batch_filter = request.GET.get('batch')
     campus_filter = request.GET.get('campus')
     
     if batch_filter:
-        profiles_list = profiles_list.filter(batch=batch_filter)
+        profiles_list = profiles_list.filter(member__batch=batch_filter)
     if campus_filter:
         profiles_list = profiles_list.filter(campus_id=campus_filter)
     
-    # Get leadership status for each profile
     for profile in profiles_list:
-        profile.is_leader = profile.user.is_association_leader
-        profile.is_committee_member = profile.user.active_committees.exists()
+        profile.is_leader = False
+        profile.is_committee_member = False
+        
+        if hasattr(profile.member, 'user_account'):
+            user = profile.member.user_account
+            profile.is_leader = user.is_association_leader
+            profile.is_committee_member = user.active_committees.exists()
     
-    # Pagination
     paginator = Paginator(profiles_list, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Get filter options
-    batches = Profile.objects.values_list('batch', flat=True).distinct().order_by('-batch')
+    batches = Member.objects.values_list('batch', flat=True).distinct().order_by('-batch')
     campuses = Campus.objects.filter(is_active=True)
     
     context = {
@@ -324,44 +322,41 @@ def all_members_directory_view(request):
     
     return render(request, 'members_committee.html', context)
 
-
-
-# Create your views here.
 def index(request):
-    """Home page view after login"""
     context = {}
     if request.user.is_authenticated:
         context['welcome_message'] = f"Welcome back, {request.user.get_short_name()}!"
+        if hasattr(request.user, 'member'):
+            context['member'] = request.user.member
+            context['member_id'] = request.user.member.member_id
     return render(request, 'index.html')
 
 def about(request):
-
-    """ View for displaying ONLY association heads (leaders)
-    Excludes regular members and committee members
-    """
-    # Get all active leadership assignments
     active_leadership = AssociationLeadership.objects.filter(
         is_active=True
     ).select_related(
-        'user__profile',
+        'user__member__profile',
         'position'
     ).order_by('position__order')
     
-    # Get the users from these leadership assignments
-    leader_users = [assignment.user for assignment in active_leadership]
-    
-    # Get profiles of these leaders
-    profiles = Profile.objects.filter(
-        user__in=leader_users,
-        is_public=True
-    ).select_related('user', 'campus')
+    # Create a list of tuples with leader and profile
+    leaders_with_profiles = []
+    for leader in active_leadership:
+        # Get the profile for this leader's member
+        try:
+            profile = Profile.objects.get(member=leader.user.member, is_public=True)
+        except Profile.DoesNotExist:
+            profile = None
+        
+        leaders_with_profiles.append({
+            'leader': leader,
+            'profile': profile
+        })
     
     context = {
-        'leaders': active_leadership,
-        'profiles': profiles,
+        'leaders_with_profiles': leaders_with_profiles,
         'page_title': 'Association Leadership',
     }
-
     return render(request, 'about.html', context)
 
 def event(request):
@@ -373,7 +368,6 @@ def contact(request):
 def gallery(request):
     return render(request, 'gallery.html')
 
-
 def gallery_single(request):
     return render(request, 'single-album.html')
 
@@ -383,9 +377,157 @@ def directory(request):
 def career(request):
     return render(request, 'career.html')
 
-
 def loginview(request):
     return render(request, 'login.html')
+
+@login_required
+def dashboard(request):
+    context = {}
+    if hasattr(request.user, 'member'):
+        member = request.user.member
+        context['member'] = member
+        try:
+            context['profile'] = Profile.objects.get(member=member)
+        except Profile.DoesNotExist:
+            context['profile'] = None
+        context['is_leader'] = request.user.is_association_leader
+        context['current_leadership'] = request.user.current_leadership_assignment
+        context['active_committees'] = request.user.active_committees
+        context['total_members'] = Member.objects.filter(is_active_member=True).count()
+        context['total_users'] = User.objects.filter(is_active=True).count()
+        context['total_leaders'] = AssociationLeadership.objects.filter(is_active=True).count()
+    return render(request, 'dashboard.html', context)
+
+
+
+@login_required
+def profile_update(request):
+    if not hasattr(request.user, 'member'):
+        messages.error(request, 'No member account found.')
+        return redirect('dashboard')
+    
+    member = request.user.member
+    try:
+        profile = Profile.objects.get(member=member)
+    except Profile.DoesNotExist:
+        profile = None
+    
+    if request.method == 'POST':
+        member_form = MemberUpdateForm(request.POST, instance=member)
+        profile_form = ProfileRegistrationForm(request.POST, request.FILES, instance=profile)
+        
+        if member_form.is_valid() and profile_form.is_valid():
+            try:
+                with transaction.atomic():
+                    member_form.save()
+                    profile_instance = profile_form.save(commit=False)
+                    profile_instance.member = member
+                    profile_instance.save()
+                    
+                    if member.email != request.user.email:
+                        request.user.email = member.email
+                        request.user.save()
+                    
+                    AuditLog.objects.create(
+                        user=request.user,
+                        member=member,
+                        action='PROFILE_UPDATE',
+                        details={'fields_updated': list(request.POST.keys())},
+                        ip_address=request.META.get('REMOTE_ADDR'),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('dashboard')
+                
+            except Exception as e:
+                messages.error(request, f'Update failed: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        member_form = MemberUpdateForm(instance=member)
+        profile_form = ProfileRegistrationForm(instance=profile)
+    
+    context = {
+        'member_form': member_form,
+        'profile_form': profile_form,
+        'member': member,
+        'profile': profile,
+    }
+    return render(request, 'profile_update.html', context)
+
+
+
+@user_passes_test(lambda u: u.is_staff)
+def admin_create_user_account(request, member_id):
+    member = get_object_or_404(Member, member_id=member_id)
+    
+    if hasattr(member, 'user_account'):
+        messages.warning(request, 'This member already has a login account.')
+        return redirect('admin_dashboard')
+    
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if not password or not confirm_password:
+            messages.error(request, 'Both password fields are required.')
+        elif password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+        else:
+            try:
+                with transaction.atomic():
+                    user = User.objects.create(
+                        member=member,
+                        email=member.email,
+                        full_name=member.full_name,
+                        is_active=True,
+                        is_verified=True
+                    )
+                    user.set_password(password)
+                    user.save()
+                    
+                    AuditLog.objects.create(
+                        user=request.user,
+                        member=member,
+                        action='USER_CREATE',
+                        details={'source': 'admin', 'admin_user': request.user.email},
+                        ip_address=request.META.get('REMOTE_ADDR'),
+                        user_agent=request.META.get('HTTP_USER_AGENT', '')
+                    )
+                
+                messages.success(request, f'Login account created for {member.full_name}.')
+                return redirect('admin_dashboard')
+                
+            except Exception as e:
+                messages.error(request, f'Account creation failed: {str(e)}')
+    
+    context = {'member': member}
+    return render(request, 'admin_create_user_account.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def admin_dashboard(request):
+    members_without_accounts = Member.objects.filter(
+        is_active_member=True
+    ).exclude(
+        user_account__isnull=False
+    ).order_by('-created_at')
+    
+    recent_members = Member.objects.filter(
+        is_active_member=True
+    ).order_by('-created_at')[:10]
+    
+    context = {
+        'members_without_accounts': members_without_accounts,
+        'recent_members': recent_members,
+        'total_members': Member.objects.filter(is_active_member=True).count(),
+        'total_users': User.objects.filter(is_active=True).count(),
+        'total_without_accounts': members_without_accounts.count(),
+    }
+    return render(request, 'admin_dashboard.html', context)
+
+
 
 
 

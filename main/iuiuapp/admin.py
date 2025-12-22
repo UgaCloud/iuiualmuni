@@ -1,13 +1,11 @@
-# accounts/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
 from django import forms
-from .models import User, Profile, Role, Campus, AuditLog, Committee, CommitteeMembership, LeadershipPosition, AssociationLeadership
+from .models import Member, User, Profile, Role, Campus, AuditLog, Committee, CommitteeMembership, LeadershipPosition, AssociationLeadership
 
 
 class UserCreationForm(forms.ModelForm):
-    """Form for creating users in admin - without requiring student_id"""
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
@@ -23,43 +21,35 @@ class UserCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
+        user = User.objects.create_user(
+            email=self.cleaned_data["email"],
+            full_name=self.cleaned_data["full_name"],
+            password=self.cleaned_data["password1"]
+        )
+        self.instance = user
         return user
+
+    def save_m2m(self):
+        # No-op since add form doesn't handle m2m fields
+        pass
+
 
 
 class ProfileInline(admin.StackedInline):
-    """Inline profile editing within User admin"""
     model = Profile
     can_delete = False
     verbose_name_plural = 'Profile'
-    fk_name = 'user'
     max_num = 1
     min_num = 1
     
     fieldsets = (
-        ('Academic Information', {
-            'fields': ('course', 'batch', 'campus', 'graduation_year')
-        }),
-        ('Contact Information', {
-            'fields': ('phone', 'address')
-        }),
-        ('Professional Information', {
-            'fields': ('current_job', 'current_company')
-        }),
-        ('Social Links', {
-            'fields': ('linkedin_url', 'github_url', 'portfolio_url')
-        }),
         ('Profile Details', {
-            'fields': ('bio', 'photo', 'is_public')
+            'fields': ('gender', 'campus', 'bio', 'photo', 'is_public')
         }),
     )
 
 
 class CommitteeMembershipInline(admin.TabularInline):
-    """Inline committee memberships within User admin"""
     model = CommitteeMembership
     extra = 1
     verbose_name = 'Committee Membership'
@@ -69,36 +59,32 @@ class CommitteeMembershipInline(admin.TabularInline):
 
 
 class AssociationLeadershipInline(admin.TabularInline):
-    """Inline association leadership assignments within User admin"""
     model = AssociationLeadership
     extra = 0
-    max_num = 1  # Users can only have one active leadership position
+    max_num = 1
     verbose_name = 'Association Leadership'
     verbose_name_plural = 'Association Leadership Assignments'
     fields = ('position', 'start_date', 'end_date', 'is_active', 'notes')
     readonly_fields = ('is_active',)
     
     def get_queryset(self, request):
-        """Only show active leadership assignments by default"""
         qs = super().get_queryset(request)
         return qs.filter(is_active=True)
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    """Custom User admin with leadership and committee management"""
     model = User
     add_form = UserCreationForm
     
-    list_display = ('student_id', 'email', 'full_name', 'is_active', 'is_association_leader_display', 'is_staff', 'date_joined')
+    list_display = ('member_id_display', 'email', 'full_name', 'is_active', 'is_association_leader_display', 'is_staff', 'date_joined')
     list_filter = ('is_active', 'is_staff', 'is_superuser', 'date_joined', 'roles')
-    search_fields = ('student_id', 'email', 'full_name')
+    search_fields = ('member__member_id', 'email', 'full_name', 'member__student_id')
     ordering = ('-date_joined',)
     
-    # Fields for viewing user
     fieldsets = (
         ('Authentication', {
-            'fields': ('student_id', 'email', 'password')
+            'fields': ('member', 'email', 'password')
         }),
         ('Personal Info', {
             'fields': ('full_name',)
@@ -111,7 +97,6 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-    # Fields for creating user (without student_id)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -122,88 +107,133 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-    # Inlines for profile, committee memberships, and leadership
-    inlines = [ProfileInline, CommitteeMembershipInline, AssociationLeadershipInline]
+    inlines = [CommitteeMembershipInline, AssociationLeadershipInline]
     
-    readonly_fields = ('student_id', 'date_joined', 'last_login', 'updated_at')
+    readonly_fields = ('date_joined', 'last_login', 'updated_at')
     
     def get_inline_instances(self, request, obj=None):
-        """Only show inlines when editing existing user"""
         if not obj:
             return []
         return super().get_inline_instances(request, obj)
     
     def is_association_leader_display(self, obj):
-        """Display leadership status in list view"""
         return obj.is_association_leader
     is_association_leader_display.short_description = 'Association Leader'
     is_association_leader_display.boolean = True
     
+    def member_id_display(self, obj):
+        return obj.member.member_id if hasattr(obj, 'member') else 'N/A'
+    member_id_display.short_description = 'Member ID'
+    member_id_display.admin_order_field = 'member__member_id'
+    
     def save_model(self, request, obj, form, change):
-        """
-        Auto-generate student ID for new users if not provided
-        """
-        if not change and not obj.student_id:
-            from .models import generate_student_id
-            # Generate unique student ID
-            while True:
-                new_id = generate_student_id()
-                if not User.objects.filter(student_id=new_id).exists():
-                    obj.student_id = new_id
-                    break
+        if not change:
+            if not hasattr(obj, 'member'):
+                member = Member.objects.create(
+                    full_name=obj.full_name,
+                    email=obj.email
+                )
+                obj.member = member
         super().save_model(request, obj, form, change)
 
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    """Profile admin"""
-    list_display = ('user_full_name', 'student_id', 'gender_display', 'course', 'batch', 'campus_name', 'is_public', 'is_association_leader_display')
-    list_filter = ('gender', 'campus', 'batch', 'is_public', 'created_at')
-    search_fields = ('user__full_name', 'user__student_id', 'user__email', 'course', 'batch')
-    list_editable = ('is_public',)
+@admin.register(Member)
+class MemberAdmin(admin.ModelAdmin):
+    list_display = ('member_id', 'student_id', 'full_name', 'email', 'batch', 'course', 'is_active_member', 'has_user_account')
+    list_filter = ('is_active_member', 'batch', 'graduation_year', 'joined_date')
+    search_fields = ('member_id', 'student_id', 'full_name', 'email', 'course', 'batch')
+    list_editable = ('is_active_member',)
     ordering = ('-created_at',)
     
     fieldsets = (
-        ('User Information', {
-            'fields': ('user', 'student_id_display', 'email_display', 'gender', 'is_association_leader_field')
+        ('Identification', {
+            'fields': ('member_id', 'student_id', 'full_name', 'email')
         }),
         ('Academic Information', {
-            'fields': ('course', 'batch', 'campus', 'graduation_year')
+            'fields': ('course', 'batch', 'graduation_year')
+        }),
+        ('Contact Information', {
+            'fields': ('phone', 'address')
         }),
         ('Professional Information', {
             'fields': ('current_job', 'current_company')
         }),
-        ('Contact Information', {
-            'fields': ('phone', 'address', 'linkedin_url', 'github_url', 'portfolio_url')
+        ('Social Links', {
+            'fields': ('linkedin_url', 'github_url', 'portfolio_url')
         }),
-        ('Profile Details', {
-            'fields': ('bio', 'photo_preview', 'photo', 'is_public')
+        ('Membership Status', {
+            'fields': ('is_active_member', 'joined_date')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
     
-    readonly_fields = ('student_id_display', 'email_display', 'photo_preview', 'is_association_leader_field')
+    readonly_fields = ('member_id', 'student_id', 'created_at', 'updated_at')
     
-    def user_full_name(self, obj):
-        return obj.user.full_name
-    user_full_name.short_description = 'Name'
-    user_full_name.admin_order_field = 'user__full_name'
+    def has_user_account(self, obj):
+        return hasattr(obj, 'user_account')
+    has_user_account.short_description = 'Has User Account'
+    has_user_account.boolean = True
     
-    def student_id(self, obj):
-        return obj.user.student_id
-    student_id.short_description = 'Student ID'
-    student_id.admin_order_field = 'user__student_id'
+    inlines = [ProfileInline]
+    
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return []
+        return super().get_inline_instances(request, obj)
+    
+    actions = ['create_user_account']
+    
+    @admin.action(description='Create user account for selected members')
+    def create_user_account(self, request, queryset):
+        created = 0
+        for member in queryset:
+            if not hasattr(member, 'user_account'):
+                try:
+                    member.create_user_account()
+                    created += 1
+                except Exception as e:
+                    self.message_user(request, f"Error creating account for {member.email}: {str(e)}", level='error')
+        self.message_user(request, f"Created user accounts for {created} members.")
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('member_full_name', 'member_id_display', 'gender_display', 'campus_name', 'is_public', 'is_association_leader_display')
+    list_filter = ('gender', 'campus', 'is_public', 'created_at')
+    search_fields = ('member__full_name', 'member__member_id', 'member__email', 'member__student_id')
+    list_editable = ('is_public',)
+    ordering = ('-created_at',)
+    
+    fieldsets = (
+        ('Member Information', {
+            'fields': ('member', 'member_id_display', 'email_display', 'gender', 'is_association_leader_field')
+        }),
+        ('Profile Details', {
+            'fields': ('campus', 'bio', 'photo_preview', 'photo', 'is_public')
+        }),
+    )
+    
+    readonly_fields = ('member_id_display', 'email_display', 'photo_preview', 'is_association_leader_field')
+    
+    def member_full_name(self, obj):
+        return obj.member.full_name
+    member_full_name.short_description = 'Name'
+    member_full_name.admin_order_field = 'member__full_name'
+    
+    def member_id_display(self, obj):
+        return obj.member.member_id
+    member_id_display.short_description = 'Member ID'
     
     def gender_display(self, obj):
         return obj.gender_display
     gender_display.short_description = 'Gender'
     gender_display.admin_order_field = 'gender'
     
-    def student_id_display(self, obj):
-        return obj.user.student_id
-    student_id_display.short_description = 'Student ID'
-    
     def email_display(self, obj):
-        return obj.user.email
+        return obj.member.email
     email_display.short_description = 'Email'
     
     def campus_name(self, obj):
@@ -216,11 +246,11 @@ class ProfileAdmin(admin.ModelAdmin):
     is_association_leader_display.boolean = True
     
     def is_association_leader_field(self, obj):
-        """Display leadership status in detail view"""
         if obj.is_association_leader:
-            assignment = obj.user.current_leadership_assignment
-            if assignment:
-                return f"Yes - {assignment.position.display_title}"
+            if hasattr(obj.member, 'user_account'):
+                assignment = obj.member.user_account.current_leadership_assignment
+                if assignment:
+                    return f"Yes - {assignment.position.display_title}"
         return "No"
     is_association_leader_field.short_description = 'Association Leadership'
     
@@ -230,11 +260,9 @@ class ProfileAdmin(admin.ModelAdmin):
         return "No photo"
     photo_preview.short_description = 'Photo Preview'
     
-    # Add actions for gender analysis
     actions = ['export_gender_stats']
     
     def export_gender_stats(self, request, queryset):
-        """Export gender statistics for selected profiles"""
         from django.http import HttpResponse
         import csv
         
@@ -269,7 +297,6 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
-    """Role admin - for permissions only"""
     list_display = ('name', 'is_default', 'user_count')
     list_filter = ('is_default',)
     search_fields = ('name', 'description')
@@ -282,15 +309,12 @@ class RoleAdmin(admin.ModelAdmin):
     
     @admin.action(description='Set as default role')
     def set_as_default(self, request, queryset):
-        """Set selected role as default (only one can be default)"""
         if queryset.count() != 1:
             self.message_user(request, "Please select exactly one role.", level='error')
             return
         
-        # Remove default from all roles
         Role.objects.filter(is_default=True).update(is_default=False)
         
-        # Set selected as default
         role = queryset.first()
         role.is_default = True
         role.save()
@@ -299,10 +323,9 @@ class RoleAdmin(admin.ModelAdmin):
 
 @admin.register(Campus)
 class CampusAdmin(admin.ModelAdmin):
-    """Campus admin"""
-    list_display = ('name', 'code', 'profile_count', 'is_active')
+    list_display = ('name', 'profile_count', 'is_active')
     list_filter = ('is_active',)
-    search_fields = ('name', 'code', 'address')
+    search_fields = ('name', 'address')
     list_editable = ('is_active',)
     ordering = ('name',)
     
@@ -313,7 +336,6 @@ class CampusAdmin(admin.ModelAdmin):
 
 @admin.register(Committee)
 class CommitteeAdmin(admin.ModelAdmin):
-    """Committee admin"""
     list_display = ('name', 'slug', 'member_count', 'is_active', 'order')
     list_filter = ('is_active',)
     search_fields = ('name', 'slug', 'description')
@@ -328,10 +350,9 @@ class CommitteeAdmin(admin.ModelAdmin):
 
 @admin.register(CommitteeMembership)
 class CommitteeMembershipAdmin(admin.ModelAdmin):
-    """Committee Membership admin"""
     list_display = ('user', 'committee', 'role', 'start_date', 'end_date', 'is_active')
     list_filter = ('is_active', 'committee', 'role', 'start_date')
-    search_fields = ('user__full_name', 'user__student_id', 'committee__name', 'role')
+    search_fields = ('user__full_name', 'user__member__member_id', 'committee__name', 'role')
     list_editable = ('is_active', 'role')
     ordering = ('-start_date',)
     autocomplete_fields = ['user', 'committee']
@@ -339,7 +360,6 @@ class CommitteeMembershipAdmin(admin.ModelAdmin):
 
 @admin.register(LeadershipPosition)
 class LeadershipPositionAdmin(admin.ModelAdmin):
-    """Leadership Position admin"""
     list_display = ('display_title', 'code', 'order', 'is_active', 'current_leader', 'assignment_count')
     list_filter = ('is_active',)
     search_fields = ('code', 'description')
@@ -347,7 +367,6 @@ class LeadershipPositionAdmin(admin.ModelAdmin):
     ordering = ('order', 'code')
     
     def current_leader(self, obj):
-        """Show current active leader for this position"""
         assignment = obj.assignments.filter(is_active=True).first()
         if assignment:
             return assignment.user.full_name
@@ -361,10 +380,9 @@ class LeadershipPositionAdmin(admin.ModelAdmin):
 
 @admin.register(AssociationLeadership)
 class AssociationLeadershipAdmin(admin.ModelAdmin):
-    """Association Leadership admin"""
     list_display = ('user', 'position_display', 'start_date', 'end_date', 'is_active', 'is_current')
     list_filter = ('is_active', 'position', 'start_date')
-    search_fields = ('user__full_name', 'user__student_id', 'position__code', 'notes')
+    search_fields = ('user__full_name', 'user__member__member_id', 'position__code', 'notes')
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('position__order', '-start_date')
     autocomplete_fields = ['user', 'position']
@@ -395,18 +413,25 @@ class AssociationLeadershipAdmin(admin.ModelAdmin):
 
 @admin.register(AuditLog)
 class AuditLogAdmin(admin.ModelAdmin):
-    """AuditLog admin - read only"""
-    list_display = ('user_display', 'action', 'timestamp', 'ip_address')
+    list_display = ('user_display', 'member_display', 'action', 'timestamp', 'ip_address')
     list_filter = ('action', 'timestamp')
-    search_fields = ('user__full_name', 'user__student_id', 'ip_address')
-    readonly_fields = ('user_display', 'action', 'details', 'ip_address', 'user_agent', 'timestamp')
+    search_fields = ('user__full_name', 'user__member__member_id', 'member__full_name', 'member__member_id', 'ip_address')
+    readonly_fields = ('user_display', 'member_display', 'action', 'details', 'ip_address', 'user_agent', 'timestamp')
     ordering = ('-timestamp',)
     
     def user_display(self, obj):
         if obj.user:
-            return f"{obj.user.full_name} ({obj.user.student_id})"
+            if hasattr(obj.user, 'member'):
+                return f"{obj.user.full_name} ({obj.user.member.member_id})"
+            return f"{obj.user.full_name} (No Member)"
         return "Unknown User"
     user_display.short_description = 'User'
+    
+    def member_display(self, obj):
+        if obj.member:
+            return f"{obj.member.full_name} ({obj.member.member_id})"
+        return "Unknown Member"
+    member_display.short_description = 'Member'
     
     def has_add_permission(self, request):
         return False
@@ -415,7 +440,6 @@ class AuditLogAdmin(admin.ModelAdmin):
         return False
 
 
-# Optional: Customize admin site headers
 admin.site.site_header = 'Alumni Association System Admin'
 admin.site.site_title = 'Alumni Association System'
 admin.site.index_title = 'Welcome to Alumni Association Administration'

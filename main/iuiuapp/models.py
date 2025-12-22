@@ -1,4 +1,3 @@
-# accounts/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ValidationError
@@ -6,22 +5,146 @@ from django.utils import timezone
 from .managers import CustomUserManager
 import random
 import string
+from PIL import Image
+
+
+def generate_member_id():
+    rand = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f"MEM-{rand}"
 
 
 def generate_student_id():
-    """Generate student ID: IUAA-XXXXXX"""
     rand = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"IUAA-{rand}"
 
 
+class Member(models.Model):
+    member_id = models.CharField(
+        max_length=30,
+        unique=True,
+        editable=False,
+        verbose_name="Member ID"
+    )
+    
+    full_name = models.CharField(
+        max_length=150,
+        verbose_name="Full Name"
+    )
+    
+    email = models.EmailField(
+        unique=True,
+        verbose_name="Email Address"
+    )
+    
+    student_id = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True,
+        verbose_name="Student ID"
+    )
+    
+    course = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Course/Department"
+    )
+    
+    batch = models.CharField(
+        max_length=10,
+        verbose_name="Batch Year"
+    )
+    
+    graduation_year = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Graduation Year"
+    )
+    
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Phone Number")
+    address = models.TextField(blank=True, verbose_name="Address")
+    
+    current_job = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Current Job/Position"
+    )
+    
+    current_company = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Current Company/Organization"
+    )
+    
+    linkedin_url = models.URLField(blank=True, verbose_name="LinkedIn Profile")
+    github_url = models.URLField(blank=True, verbose_name="GitHub Profile")
+    portfolio_url = models.URLField(blank=True, verbose_name="Portfolio Website")
+    
+    is_active_member = models.BooleanField(
+        default=True,
+        verbose_name="Active Member"
+    )
+    
+    joined_date = models.DateField(
+        default=timezone.now,
+        verbose_name="Member Since"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['full_name']
+        verbose_name = "Member"
+        verbose_name_plural = "Members"
+        indexes = [
+            models.Index(fields=['member_id']),
+            models.Index(fields=['email']),
+            models.Index(fields=['full_name']),
+            models.Index(fields=['batch']),
+            models.Index(fields=['graduation_year']),
+            models.Index(fields=['is_active_member']),
+        ]
+    
+    def __str__(self):
+        return f"{self.full_name} ({self.member_id})"
+    
+    def save(self, *args, **kwargs):
+        if not self.member_id:
+            while True:
+                generated_id = generate_member_id()
+                if not Member.objects.filter(member_id=generated_id).exists():
+                    self.member_id = generated_id
+                    break
+        
+        if not self.student_id:
+            self.student_id = generate_student_id()
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def is_user(self):
+        return hasattr(self, 'user_account')
+    
+    def create_user_account(self, password=None):
+        from django.contrib.auth.hashers import make_password
+        
+        if hasattr(self, 'user_account'):
+            raise ValidationError("Member already has a user account")
+        
+        user = User.objects.create(
+            member=self,
+            email=self.email,
+            full_name=self.full_name,
+            password=make_password(password) if password else make_password(None)
+        )
+        
+        return user
+
+
 class Role(models.Model):
-    """User role for permissions only - NOT for leadership positions"""
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
-    is_default = models.BooleanField(
-        default=False,
-        help_text="Assign this role to new users automatically"
-    )
+    is_default = models.BooleanField(default=False)
     
     class Meta:
         ordering = ['name']
@@ -45,9 +168,7 @@ class Role(models.Model):
 
 
 class Campus(models.Model):
-    """Campus model for physical locations"""
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
     address = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     
@@ -61,7 +182,6 @@ class Campus(models.Model):
 
 
 class Committee(models.Model):
-    """Committees under the alumni association - separate from leadership"""
     name = models.CharField(max_length=100, unique=True, verbose_name="Committee Name")
     description = models.TextField(blank=True, verbose_name="Description")
     slug = models.SlugField(max_length=100, unique=True, verbose_name="URL Slug")
@@ -85,12 +205,6 @@ class Committee(models.Model):
 
 
 class LeadershipPosition(models.Model):
-    """
-    Association-wide leadership positions (President, Secretary, etc.).
-    FIX 1: Removed title-code redundancy. Only 'code' is unique identifier.
-    Display title is automatically derived from code for admin convenience.
-    """
-    # Core leadership positions for the alumni association
     POSITION_CHOICES = [
         ('PRESIDENT', 'President'),
         ('VICE_PRESIDENT', 'Vice President'),
@@ -100,7 +214,6 @@ class LeadershipPosition(models.Model):
         ('EXECUTIVE_MEMBER', 'Executive Member'),
     ]
     
-    # FIX: Use code as the unique identifier, remove separate title field
     code = models.CharField(
         max_length=50,
         choices=POSITION_CHOICES,
@@ -115,8 +228,7 @@ class LeadershipPosition(models.Model):
     
     order = models.PositiveIntegerField(
         default=0,
-        verbose_name="Display Order",
-        help_text="Lower numbers appear first"
+        verbose_name="Display Order"
     )
     
     is_active = models.BooleanField(
@@ -140,24 +252,160 @@ class LeadershipPosition(models.Model):
     
     @property
     def display_title(self):
-        """Automatically derive display title from code"""
         return dict(self.POSITION_CHOICES).get(self.code, self.code.replace('_', ' ').title())
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    member = models.OneToOneField(
+        Member,
+        on_delete=models.CASCADE,
+        related_name='user_account',
+        verbose_name="Member"
+    )
+    
+    email = models.EmailField(
+        unique=True,
+        verbose_name="Login Email"
+    )
+    
+    full_name = models.CharField(
+        max_length=150,
+        verbose_name="Full Name"
+    )
+    
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    
+    date_joined = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    roles = models.ManyToManyField(
+        Role,
+        blank=True,
+        related_name='users',
+        verbose_name="User Roles"
+    )
+    
+    committees = models.ManyToManyField(
+        Committee,
+        through='CommitteeMembership',
+        related_name='committee_members',
+        blank=True,
+        verbose_name="Committees"
+    )
+    
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        related_name='custom_user_set',
+        related_query_name='custom_user',
+    )
+    
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        related_name='custom_user_set',
+        related_query_name='custom_user',
+    )
+    
+    objects = CustomUserManager()
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['full_name']
+    
+    class Meta:
+        ordering = ['-date_joined']
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['member']),
+        ]
+    
+    def __str__(self):
+        return self.full_name
     
     def save(self, *args, **kwargs):
-        # FIX: No need to auto-populate title since we use property
+        if self.member:
+            self.email = self.member.email
+            self.full_name = self.member.full_name
         super().save(*args, **kwargs)
+    
+    def get_full_name(self):
+        return self.full_name
+    
+    def get_short_name(self):
+        return self.full_name.split()[0] if ' ' in self.full_name else self.full_name
+    
+    def has_role(self, role_name):
+        return self.roles.filter(name=role_name).exists()
+    
+    def get_default_role(self):
+        default_role = self.roles.filter(is_default=True).first()
+        if not default_role:
+            default_role = self.roles.first()
+        return default_role
+    
+    @property
+    def student_id(self):
+        return self.member.student_id
+    
+    @property
+    def member_id(self):
+        return self.member.member_id
+    
+    @property
+    def is_association_leader(self):
+        return self.leadership_assignments.filter(is_active=True).exists()
+    
+    @property
+    def current_leadership_assignment(self):
+        return self.leadership_assignments.filter(is_active=True).first()
+    
+    @property
+    def leadership_history(self):
+        return self.leadership_assignments.all().order_by('-start_date')
+    
+    @property
+    def active_committees(self):
+        return self.committee_memberships.filter(is_active=True).select_related('committee')
+    
+    @property
+    def is_student(self):
+        return self.has_role('Student')
+    
+    @property
+    def is_alumni(self):
+        return self.has_role('Alumni')
+    
+    @property
+    def is_admin(self):
+        return self.has_role('Admin') or self.is_superuser
+    
+    @property
+    def is_staff_member(self):
+        return self.has_role('Staff')
+    
+    @property
+    def batch(self):
+        return self.member.batch
+    
+    @property
+    def graduation_year(self):
+        return self.member.graduation_year
+    
+    @property
+    def course(self):
+        return self.member.course
 
 
 class AssociationLeadership(models.Model):
-    """
-    Assigns association leadership positions to existing users.
-    FIX 2: Added validation to ensure user can hold only ONE active leadership position.
-    FIX 3: Improved related_name clarity for single active position.
-    """
     user = models.ForeignKey(
-        'User',
+        User,
         on_delete=models.CASCADE,
-        # FIX 3: Clearer naming - 'leadership_assignments' indicates this is a history
         related_name='leadership_assignments',
         verbose_name="Leader"
     )
@@ -165,7 +413,6 @@ class AssociationLeadership(models.Model):
     position = models.ForeignKey(
         LeadershipPosition,
         on_delete=models.CASCADE,
-        # FIX 3: Clearer naming - 'assignments' indicates multiple can exist over time
         related_name='assignments',
         verbose_name="Leadership Position"
     )
@@ -183,14 +430,12 @@ class AssociationLeadership(models.Model):
     
     is_active = models.BooleanField(
         default=True,
-        verbose_name="Currently Active",
-        help_text="Uncheck when the leader resigns or completes term"
+        verbose_name="Currently Active"
     )
     
     notes = models.TextField(
         blank=True,
-        verbose_name="Notes",
-        help_text="Optional notes about this leadership term"
+        verbose_name="Notes"
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -211,9 +456,6 @@ class AssociationLeadership(models.Model):
         return f"{self.user.full_name} - {self.position.display_title} ({status})"
     
     def clean(self):
-        """FIX 2 & 4: Comprehensive validation for leadership constraints"""
-        
-        # FIX 2: Ensure only one active user per leadership position at a time
         if self.is_active and self.position_id:
             active_conflicts = AssociationLeadership.objects.filter(
                 position_id=self.position_id,
@@ -222,11 +464,9 @@ class AssociationLeadership(models.Model):
             
             if active_conflicts.exists():
                 raise ValidationError(
-                    f"Only one active {self.position.display_title} can exist at a time. "
-                    f"Please deactivate the current leader first."
+                    f"Only one active {self.position.display_title} can exist at a time."
                 )
         
-        # FIX 2: Ensure user can hold only ONE active association leadership position at a time
         if self.is_active and self.user_id:
             user_active_positions = AssociationLeadership.objects.filter(
                 user_id=self.user_id,
@@ -235,23 +475,18 @@ class AssociationLeadership(models.Model):
             
             if user_active_positions.exists():
                 raise ValidationError(
-                    f"{self.user.full_name if hasattr(self, 'user') else 'This user'} "
-                    f"already holds an active leadership position. A user can only hold "
-                    f"one active association leadership position at a time."
+                    f"{self.user.full_name if hasattr(self, 'user') else 'This user'} already holds an active leadership position."
                 )
         
-        # FIX 4: Keep date validations intact
         if self.end_date and self.start_date and self.end_date < self.start_date:
             raise ValidationError("End date cannot be before start date.")
     
     def save(self, *args, **kwargs):
-        # FIX 4: Ensure clean() is always called on save
         self.clean()
         super().save(*args, **kwargs)
     
     @property
     def is_current(self):
-        """Check if this leadership assignment is current"""
         return self.is_active and (
             not self.end_date or 
             self.end_date >= timezone.now().date()
@@ -259,9 +494,8 @@ class AssociationLeadership(models.Model):
 
 
 class CommitteeMembership(models.Model):
-    """Tracks user membership in committees - separate from association leadership"""
     user = models.ForeignKey(
-        'User',
+        User,
         on_delete=models.CASCADE,
         related_name='committee_memberships',
         verbose_name="Member"
@@ -277,8 +511,7 @@ class CommitteeMembership(models.Model):
     role = models.CharField(
         max_length=100,
         default="Member",
-        verbose_name="Role in Committee",
-        help_text="e.g., Coordinator, Volunteer, Member"
+        verbose_name="Role in Committee"
     )
     
     start_date = models.DateField(
@@ -313,7 +546,6 @@ class CommitteeMembership(models.Model):
         return f"{self.user.full_name} - {self.committee.name} ({self.role})"
     
     def clean(self):
-        # FIX 4: Keep date validation
         if self.end_date and self.start_date and self.end_date < self.start_date:
             raise ValidationError("End date cannot be before start date.")
     
@@ -322,190 +554,25 @@ class CommitteeMembership(models.Model):
         super().save(*args, **kwargs)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    """Custom User model for alumni association members"""
-    student_id = models.CharField(
-        max_length=30,
-        unique=True,
-        editable=False,
-        verbose_name="Student ID"
-    )
-    
-    email = models.EmailField(
-        unique=True,
-        verbose_name="Email Address"
-    )
-    
-    full_name = models.CharField(
-        max_length=150,
-        verbose_name="Full Name"
-    )
-    
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)
-    
-    date_joined = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # User roles for permissions (Student, Alumni, Admin, Staff)
-    roles = models.ManyToManyField(
-        Role,
-        blank=True,
-        related_name='users',
-        verbose_name="User Roles"
-    )
-    
-    # Committees the user belongs to
-    committees = models.ManyToManyField(
-        Committee,
-        through=CommitteeMembership,
-        related_name='committee_members',
-        blank=True,
-        verbose_name="Committees"
-    )
-    
-    # Fix permission conflicts
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        related_name='custom_user_set',
-        related_query_name='custom_user',
-    )
-    
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        related_name='custom_user_set',
-        related_query_name='custom_user',
-    )
-    
-    objects = CustomUserManager()
-    
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name']
-    
-    class Meta:
-        ordering = ['-date_joined']
-        verbose_name = "User"
-        verbose_name_plural = "Users"
-        indexes = [
-            models.Index(fields=['student_id']),
-            models.Index(fields=['email']),
-            models.Index(fields=['full_name']),
-        ]
-    
-    def __str__(self):
-        return self.student_id
-    
-    def save(self, *args, **kwargs):
-        # Auto-generate student_id if it doesn't exist
-        if not self.student_id:
-            self.student_id = generate_student_id()
-        
-        # For superusers, make sure they have an admin student_id
-        if self.is_superuser and not self.student_id.startswith('ADMIN_'):
-            # Regenerate with ADMIN_ prefix
-            while True:
-                new_student_id = f"ADMIN_{generate_student_id()}"
-                if not User.objects.filter(student_id=new_student_id).exists():
-                    self.student_id = new_student_id
-                    break
-        
-        super().save(*args, **kwargs)
-    
-    def get_full_name(self):
-        return self.full_name
-    
-    def get_short_name(self):
-        return self.full_name.split()[0] if ' ' in self.full_name else self.full_name
-    
-    def has_role(self, role_name):
-        return self.roles.filter(name=role_name).exists()
-    
-    def get_default_role(self):
-        default_role = self.roles.filter(is_default=True).first()
-        if not default_role:
-            default_role = self.roles.first()
-        return default_role
-    
-    # Leadership-related properties
-    @property
-    def is_association_leader(self):
-        """Check if user currently holds any association leadership position"""
-        return self.leadership_assignments.filter(is_active=True).exists()
-    
-    @property
-    def current_leadership_assignment(self):
-        """Get user's current association leadership assignment, if any"""
-        # FIX 3: Renamed for clarity - this is the assignment, not just the position
-        return self.leadership_assignments.filter(is_active=True).first()
-    
-    @property
-    def leadership_history(self):
-        """Get user's complete leadership history"""
-        return self.leadership_assignments.all().order_by('-start_date')
-    
-    # Committee-related properties
-    @property
-    def active_committees(self):
-        """Get user's active committee memberships"""
-        return self.committee_memberships.filter(is_active=True).select_related('committee')
-    
-    # Role-based properties (for templates)
-    @property
-    def is_student(self):
-        return self.has_role('Student')
-    
-    @property
-    def is_alumni(self):
-        return self.has_role('Alumni')
-    
-    @property
-    def is_admin(self):
-        return self.has_role('Admin') or self.is_superuser
-    
-    @property
-    def is_staff_member(self):
-        return self.has_role('Staff')
-
-
 class Profile(models.Model):
-    """Extended profile information for all users"""
-    
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
+        ('P', 'Prefer not to say'),
     ]
     
-    user = models.OneToOneField(
-        User,
+    member = models.OneToOneField(
+        Member,
         on_delete=models.CASCADE,
         related_name='profile',
-        verbose_name="User"
+        verbose_name="Member"
     )
     
-    # Add gender field
     gender = models.CharField(
         max_length=1,
         choices=GENDER_CHOICES,
         default='P',
         verbose_name="Gender"
-    )
-    
-    course = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="Course/Department",
-        help_text="e.g., Computer Science, Business Administration"
-    )
-    
-    batch = models.CharField(
-        max_length=10,
-        verbose_name="Batch Year",
-        help_text="Format: YYYY or YYYY-YYYY"
     )
     
     campus = models.ForeignKey(
@@ -525,69 +592,41 @@ class Profile(models.Model):
         verbose_name="Profile Photo"
     )
     
-    # Contact Information
-    phone = models.CharField(max_length=20, blank=True, verbose_name="Phone Number")
-    address = models.TextField(blank=True, verbose_name="Address")
-    
-    # Academic Information
-    graduation_year = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Graduation Year"
-    )
-    
-    current_job = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="Current Job/Position"
-    )
-    
-    current_company = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="Current Company/Organization"
-    )
-    
-    # Social Links
-    linkedin_url = models.URLField(blank=True, verbose_name="LinkedIn Profile")
-    github_url = models.URLField(blank=True, verbose_name="GitHub Profile")
-    portfolio_url = models.URLField(blank=True, verbose_name="Portfolio Website")
-    
-    # Status
     is_public = models.BooleanField(
         default=True,
-        verbose_name="Public Profile",
-        help_text="If checked, profile will be visible in directory"
+        verbose_name="Public Profile"
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        ordering = ['user__full_name']
+        ordering = ['member__full_name']
         verbose_name = "Profile"
         verbose_name_plural = "Profiles"
         indexes = [
-            models.Index(fields=['batch']),
-            models.Index(fields=['graduation_year']),
             models.Index(fields=['is_public']),
-            models.Index(fields=['gender']),  # Added index for gender queries
+            models.Index(fields=['gender']),
         ]
     
     def __str__(self):
-        return f"{self.user.full_name} - {self.batch}"
+        return f"{self.member.full_name} - {self.member.batch}"
     
     @property
     def name(self):
-        return self.user.full_name
+        return self.member.full_name
     
     @property
     def email(self):
-        return self.user.email
+        return self.member.email
     
     @property
     def student_id(self):
-        return self.user.student_id
+        return self.member.student_id
+    
+    @property
+    def member_id(self):
+        return self.member.member_id
     
     @property
     def campus_name(self):
@@ -595,41 +634,62 @@ class Profile(models.Model):
     
     @property
     def gender_display(self):
-        """Return the human-readable gender value"""
         return dict(self.GENDER_CHOICES).get(self.gender, 'Not specified')
     
     @property
     def is_association_leader(self):
-        """Convenience property to check if user is a leader"""
-        return self.user.is_association_leader
+        if self.member.is_user:
+            return self.member.user_account.is_association_leader
+        return False
     
     @property
     def current_leadership_info(self):
-        """Get current leadership information, if any"""
-        assignment = self.user.current_leadership_assignment
-        if assignment:
-            return {
-                'title': assignment.position.display_title,
-                'start_date': assignment.start_date,
-                'is_current': assignment.is_current
-            }
+        if self.member.is_user:
+            assignment = self.member.user_account.current_leadership_assignment
+            if assignment:
+                return {
+                    'title': assignment.position.display_title,
+                    'start_date': assignment.start_date,
+                    'is_current': assignment.is_current
+                }
         return None
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        
+        # Resize photo if it exists
+        if self.photo:
+            img = Image.open(self.photo)
+            # Resize to 397x556, maintaining aspect ratio
+            img.thumbnail((397, 556), Image.Resampling.LANCZOS)
+            # Create a new image with the exact size, centered
+            new_img = Image.new('RGB', (397, 556), (255, 255, 255))
+            # Calculate position to center the image
+            x = (397 - img.width) // 2
+            y = (556 - img.height) // 2
+            new_img.paste(img, (x, y))
+            # Save the resized image back
+            from io import BytesIO
+            from django.core.files.base import ContentFile
+            buffer = BytesIO()
+            new_img.save(buffer, format='JPEG', quality=85)
+            buffer.seek(0)
+            self.photo.save(self.photo.name, ContentFile(buffer.read()), save=False)
+        
         super().save(*args, **kwargs)
         
-        if is_new and not self.user.roles.exists():
-            default_role = Role.objects.filter(is_default=True).first()
-            if default_role:
-                self.user.roles.add(default_role)
-            else:
-                alumni_role, created = Role.objects.get_or_create(name='Alumni')
-                self.user.roles.add(alumni_role)
+        if is_new and self.member.is_user:
+            user = self.member.user_account
+            if not user.roles.exists():
+                default_role = Role.objects.filter(is_default=True).first()
+                if default_role:
+                    user.roles.add(default_role)
+                else:
+                    alumni_role, created = Role.objects.get_or_create(name='Alumni')
+                    user.roles.add(alumni_role)
 
 
 class AuditLog(models.Model):
-    """Audit log for tracking user activities"""
     ACTION_CHOICES = [
         ('LOGIN', 'Login'),
         ('LOGOUT', 'Logout'),
@@ -641,6 +701,8 @@ class AuditLog(models.Model):
         ('LEADERSHIP_REVOKE', 'Leadership Revocation'),
         ('COMMITTEE_JOIN', 'Committee Join'),
         ('COMMITTEE_LEAVE', 'Committee Leave'),
+        ('MEMBER_CREATE', 'Member Created'),
+        ('USER_CREATE', 'User Account Created'),
     ]
     
     user = models.ForeignKey(
@@ -649,6 +711,14 @@ class AuditLog(models.Model):
         null=True,
         related_name='audit_logs',
         verbose_name="User"
+    )
+    
+    member = models.ForeignKey(
+        Member,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='audit_logs',
+        verbose_name="Member"
     )
     
     action = models.CharField(
@@ -675,25 +745,26 @@ class AuditLog(models.Model):
         verbose_name_plural = "Audit Logs"
         indexes = [
             models.Index(fields=['user', 'action']),
+            models.Index(fields=['member', 'action']),
             models.Index(fields=['timestamp']),
         ]
     
     def __str__(self):
-        return f"{self.user.student_id if self.user else 'Unknown'} - {self.action} - {self.timestamp}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        user_id = self.user.member_id if self.user else 'No User'
+        member_id = self.member.member_id if self.member else 'No Member'
+        return f"{user_id}/{member_id} - {self.action} - {self.timestamp}"
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

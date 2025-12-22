@@ -27,12 +27,12 @@
                                             {% endif %}
                                             
                                             <div class="register-form">
-                                                <form method="post" novalidate>
+                                                <form method="post" novalidate enctype="multipart/form-data">
                                                     {% csrf_token %}
                                                     
-                                                    <!-- Account Information -->
+                                                    <!-- Personal Information -->
                                                     <div class="section-title mb-3">
-                                                        <h5 class="border-bottom pb-2">Account Information</h5>
+                                                        <h5 class="border-bottom pb-2">Personal Information</h5>
                                                     </div>
                                                     
                                                     <div class="row">
@@ -60,32 +60,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label for="{{ user_form.password1.id_for_label }}">Password *</label>
-                                                                {{ user_form.password1 }}
-                                                                {% if user_form.password1.errors %}
-                                                                <div class="text-danger small mt-1">
-                                                                    {{ user_form.password1.errors|join:", " }}
-                                                                </div>
-                                                                {% endif %}
-                                                                <small class="form-text text-muted">At least 8 characters</small>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-12 col-sm-6">
-                                                            <div class="form-group">
-                                                                <label for="{{ user_form.password2.id_for_label }}">Confirm Password *</label>
-                                                                {{ user_form.password2 }}
-                                                                {% if user_form.password2.errors %}
-                                                                <div class="text-danger small mt-1">
-                                                                    {{ user_form.password2.errors|join:", " }}
-                                                                </div>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                     
                                                     <!-- Academic Information -->
                                                     <div class="section-title mb-3 mt-4">
@@ -95,24 +69,24 @@
                                                     <div class="row">
                                                         <div class="col-12 col-sm-6">
                                                             <div class="form-group">
-                                                                <label for="{{ profile_form.batch.id_for_label }}">Batch *</label>
-                                                                {{ profile_form.batch }}
-                                                                {% if profile_form.batch.errors %}
+                                                                <label for="{{ user_form.batch.id_for_label }}">Batch *</label>
+                                                                {{ user_form.batch }}
+                                                                {% if user_form.batch.errors %}
                                                                 <div class="text-danger small mt-1">
-                                                                    {{ profile_form.batch.errors|join:", " }}
+                                                                    {{ user_form.batch.errors|join:", " }}
                                                                 </div>
                                                                 {% endif %}
-                                                                <!-- <small class="form-text text-muted">Format: YYYY or YYYY-YYYY</small> -->
+                                                                <small class="form-text text-muted">Format: YYYY or YYYY-YYYY</small>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-12 col-sm-6">
                                                             <div class="form-group">
-                                                                <label for="{{ profile_form.course.id_for_label }}">Course/Department *</label>
-                                                                {{ profile_form.course }}
-                                                                {% if profile_form.course.errors %}
+                                                                <label for="{{ user_form.course.id_for_label }}">Course/Department *</label>
+                                                                {{ user_form.course }}
+                                                                {% if user_form.course.errors %}
                                                                 <div class="text-danger small mt-1">
-                                                                    {{ profile_form.course.errors|join:", " }}
+                                                                    {{ user_form.course.errors|join:", " }}
                                                                 </div>
                                                                 {% endif %}
                                                             </div>
@@ -122,11 +96,11 @@
                                                     <div class="row">
                                                         <div class="col-12 col-sm-6">
                                                             <div class="form-group">
-                                                                <label for="{{ profile_form.graduation_year.id_for_label }}">Graduation Year</label>
-                                                                {{ profile_form.graduation_year }}
-                                                                {% if profile_form.graduation_year.errors %}
+                                                                <label for="{{ user_form.graduation_year.id_for_label }}">Graduation Year</label>
+                                                                {{ user_form.graduation_year }}
+                                                                {% if user_form.graduation_year.errors %}
                                                                 <div class="text-danger small mt-1">
-                                                                    {{ profile_form.graduation_year.errors|join:", " }}
+                                                                    {{ user_form.graduation_year.errors|join:", " }}
                                                                 </div>
                                                                 {% endif %}
                                                             </div>
@@ -145,7 +119,26 @@
                                                         </div>
                                                     </div>
                                                     
-                                                    <!-- Gender Field - BLOCK LAYOUT -->
+                                                    <!-- Contact Information -->
+                                                    <div class="section-title mb-3 mt-4">
+                                                        <h5 class="border-bottom pb-2">Contact Information</h5>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="form-group">
+                                                                <label for="{{ user_form.phone.id_for_label }}">Phone Number</label>
+                                                                {{ user_form.phone }}
+                                                                {% if user_form.phone.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ user_form.phone.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Gender Field -->
                                                     <div class="row mb-3">
                                                         <div class="col-12">
                                                             <div class="gender form-group">
@@ -169,35 +162,56 @@
                                                         </div>
                                                     </div>
                                                     
+                                                    <!-- Profile Information -->
+                                                    <div class="section-title mb-3 mt-4">
+                                                        <h5 class="border-bottom pb-2">Profile Information</h5>
+                                                    </div>
+                                                    
                                                     <div class="row">
-                                                        <div class="col-12 col-sm-6">
+                                                        <div class="col-12">
                                                             <div class="form-group">
-                                                                <label for="{{ profile_form.phone.id_for_label }}">Phone Number</label>
-                                                                {{ profile_form.phone }}
-                                                                {% if profile_form.phone.errors %}
+                                                                <label for="{{ profile_form.bio.id_for_label }}">Bio/About Me</label>
+                                                                {{ profile_form.bio }}
+                                                                {% if profile_form.bio.errors %}
                                                                 <div class="text-danger small mt-1">
-                                                                    {{ profile_form.phone.errors|join:", " }}
+                                                                    {{ profile_form.bio.errors|join:", " }}
                                                                 </div>
                                                                 {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
                                                     
-                                                    <!-- Terms and Submit -->
-                                                    <div class="form-group mt-4">
-                                                        <!-- <div class="custom-control custom-checkbox float-lg-right">
-                                                            <input type="checkbox" class="custom-control-input"
-                                                                   id="terms_agree" name="terms_agree" required>
-                                                            <label class="custom-control-label" for="terms_agree">
-                                                                I have read and agree to the <a href="/terms/">Alumni</a> Terms
-                                                                of Service
-                                                            </label>
-                                                        </div> -->
-                                                        <button type="submit" class="btn btn-reg">Registration</button>
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="form-group">
+                                                                <label for="{{ profile_form.photo.id_for_label }}">Profile Photo</label>
+                                                                {{ profile_form.photo }}
+                                                                {% if profile_form.photo.errors %}
+                                                                <div class="text-danger small mt-1">
+                                                                    {{ profile_form.photo.errors|join:", " }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-													<label class="custom-control-label">
-													Already have an account <a href="{% url 'login' %}">Login</a>
-													</label>
+                                                    
+                                                    <!-- Note about login account -->
+                                                    <!-- <div class="alert alert-info mt-4">
+                                                        <i class="fa fa-info-circle"></i>
+                                                        <strong>Note:</strong> After registration, the admin will review your application. 
+                                                        If approved, you will receive login credentials via email.
+                                                    </div> -->
+                                                    
+                                                    <!-- Submit Button -->
+                                                    <div class="form-group mt-4">
+                                                        <button type="submit" class="btn btn-reg">Register as Member</button>
+                                                    </div>
+													
+													<div class="mt-3 text-center">
+														<label class="custom-control-label">
+															Already have an account? <a href="{% url 'login' %}">Login here</a>
+														</label>
+													</div>
                                                 </form>
                                             </div>
                                         </div>
