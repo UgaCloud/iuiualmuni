@@ -246,6 +246,10 @@ JAZZMIN_SETTINGS = {
         "iuiuapp.Profile": "fas fa-id-card",
         "iuiuapp.AuditLog": "fas fa-history",
         "iuiuapp.CommitteeMembership": "fas fa-handshake",
+        "iuiuapp.Event": "fas fa-calendar-alt",
+        "iuiuapp.GalleryAlbum": "fas fa-images",
+        "iuiuapp.GalleryImage": "fas fa-image",
+        "iuiuapp.JobAdvertisement": "fas fa-briefcase",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
