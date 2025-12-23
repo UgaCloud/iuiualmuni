@@ -1,0 +1,20 @@
+
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/bin/pip install -r /home2/iuiuaaor/public_html/main/requirements.txt
+
+
+/home2/iuiuaaor/public_html/main/manage.py makemigrations
+/home2/iuiuaaor/public_html/main/manage.py migrate
+
+// after configuring passengers file //
+/home2/iuiuaaor/public_html/main/manage.py collectstatic --noinput
+
+
+
+/home2/iuiuaaor/public_html/main/create_superuser.py
+
+
+
+
+
+
+
