@@ -3,53 +3,6 @@
     <div class="career-page-content-wrap section-padding">
         <div class="container">
 
-            <!-- Filter Section -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="event-filter-area">
-                        <form method="GET" action="" class="form-inline d-flex">
-                            <select name="category" id="category" class="form-control mr-2">
-                                <option value="">All Categories</option>
-                                {% for category in categories %}
-                                <option value="{{ category.0 }}" {% if selected_category == category.0 %}selected{% endif %}>
-                                    {{ category.1 }}
-                                </option>
-                                {% endfor %}
-                            </select>
-
-                            <select name="job_type" id="job_type" class="form-control mr-2">
-                                <option value="">All Types</option>
-                                {% for job_type in job_types %}
-                                <option value="{{ job_type.0 }}" {% if selected_job_type == job_type.0 %}selected{% endif %}>
-                                    {{ job_type.1 }}
-                                </option>
-                                {% endfor %}
-                            </select>
-
-                            <select name="location" id="location" class="form-control mr-2">
-                                <option value="">All Locations</option>
-                                {% for loc in locations %}
-                                <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>
-                                    {{ loc }}
-                                </option>
-                                {% endfor %}
-                            </select>
-
-                            <select name="status" id="status" class="form-control mr-2">
-                                <option value="">All Status</option>
-                                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active Only</option>
-                                <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Expired</option>
-                                <option value="new" {% if selected_status == 'new' %}selected{% endif %}>New (Last 7 Days)</option>
-                            </select>
-
-                            <button type="submit" class="btn btn-brand">Filter</button>
-                            {% if any_filter_active %}
-                            <a href="{% url 'career' %}" class="btn btn-outline-secondary ml-2">Clear Filters</a>
-                            {% endif %}
-                        </form>
-                    </div>
-                </div>
-            </div>
 
             <!-- Results Count -->
             {% if any_filter_active %}

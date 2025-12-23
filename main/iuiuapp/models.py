@@ -1086,42 +1086,17 @@ class GalleryImage(models.Model):
         return self.title or f"Image in {self.album.title}"    
     
 
-# models.py
-from django.db import models
-from django.utils import timezone
-from django.utils.text import slugify
+
 
 class JobAdvertisement(models.Model):
     # Basic Information
-    title = models.CharField(
-        max_length=200,
-        verbose_name="Job Title"
-    )
+    title = models.CharField(max_length=200, verbose_name="Job Title")
+    company_name = models.CharField(max_length=200, verbose_name="Company Name")
+    company_logo = models.ImageField(upload_to='company-logos/',blank=True,null=True,verbose_name="Company Logo")
     
-    company_name = models.CharField(
-        max_length=200,
-        verbose_name="Company Name"
-    )
+    short_description = models.TextField(verbose_name="Short Description",help_text="Brief description of the job")
     
-    company_logo = models.ImageField(
-        upload_to='company-logos/',
-        blank=True,
-        null=True,
-        verbose_name="Company Logo"
-    )
-    
-    # Description
-    short_description = models.TextField(
-        verbose_name="Short Description",
-        help_text="Brief description of the job"
-    )
-    
-    # Advertisement Details
-    application_url = models.URLField(
-        max_length=500,
-        verbose_name="Application URL",
-        help_text="External link where candidates can apply"
-    )
+    # Advertisement Detailsation_url = models.URLField(max_length=500,verbose_name="Application URL",help_text="External link where candidates can apply")
     
     # Status & Dates
     is_active = models.BooleanField(
@@ -1156,6 +1131,14 @@ class JobAdvertisement(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.company_name}"
+    
+    
+    
+    
+    
+    
+    
+    
 
 
     
