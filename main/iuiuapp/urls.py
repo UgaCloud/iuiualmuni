@@ -12,8 +12,10 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('events/', views.event, name = 'event'),
+    path('events/<slug:event_slug>/', views.single_event, name='event_detail'),
     path('gallery/', views.gallery, name='gallery'),
     path('single-album/', views.gallery_single, name='gallery_single'),
+    path('single-album/<slug:album_slug>/', views.gallery_single, name='gallery_single_slug'),
     path('directory/', views.event, name = 'directory'),
     path('career/', views.career, name='career'),
     

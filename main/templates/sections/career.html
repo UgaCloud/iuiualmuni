@@ -1,260 +1,262 @@
 {% load static %}
 <section id="page-content-wrap">
-	<div class="career-page-wrapper">
-		<div class="career-page-topbg">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-10 m-auto">
-						<img src="{% static 'assets/images/careerbg.png' %}" class="img-fluid" alt="career">
-					</div>
-				</div>
-			</div>
-		</div>
+    <div class="career-page-content-wrap section-padding">
+        <div class="container">
 
-		<div class="career-page-content-wrap section-padding">
-			<div class="container">
+            <!-- Filter Section -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="event-filter-area">
+                        <form method="GET" action="" class="form-inline d-flex">
+                            <select name="category" id="category" class="form-control mr-2">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.0 }}" {% if selected_category == category.0 %}selected{% endif %}>
+                                    {{ category.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
 
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="event-filter-area">
-							<form action="index.html" class="form-inline d-flex">
-								<select name="cat" id="year">
-									<option selected>Categories</option>
-									<option>2018</option>
-									<option>2017</option>
-									<option>2016</option>
-									<option>2015</option>
-									<option>2014</option>
-								</select>
+                            <select name="job_type" id="job_type" class="form-control mr-2">
+                                <option value="">All Types</option>
+                                {% for job_type in job_types %}
+                                <option value="{{ job_type.0 }}" {% if selected_job_type == job_type.0 %}selected{% endif %}>
+                                    {{ job_type.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
 
-								<select name="place" id="place">
-									<option selected>Place</option>
-									<option>Alabama</option>
-									<option>Alaska</option>
-									<option>Arizona</option>
-									<option>Colorado</option>
-									<option>Delaware</option>
-								</select>
+                            <select name="location" id="location" class="form-control mr-2">
+                                <option value="">All Locations</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>
+                                    {{ loc }}
+                                </option>
+                                {% endfor %}
+                            </select>
 
-								<select name="type" id="type">
-									<option selected>Type</option>
-									<option>Meetup</option>
-									<option>Seminar</option>
-									<option>Get Together</option>
-								</select>
+                            <select name="status" id="status" class="form-control mr-2">
+                                <option value="">All Status</option>
+                                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active Only</option>
+                                <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Expired</option>
+                                <option value="new" {% if selected_status == 'new' %}selected{% endif %}>New (Last 7 Days)</option>
+                            </select>
 
-								<button class="btn btn-brand">Filter</button>
-							</form>
-						</div>
-					</div>
-				</div>
+                            <button type="submit" class="btn btn-brand">Filter</button>
+                            {% if any_filter_active %}
+                            <a href="{% url 'career' %}" class="btn btn-outline-secondary ml-2">Clear Filters</a>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-				<div class="job-opportunity-wrapper">
-					<div class="row">
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-1.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
+            <!-- Results Count -->
+            {% if any_filter_active %}
+            <div class="row mt-3">
+                <div class="col-lg-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-filter"></i>
+                        Showing {{ jobs.paginator.count }} job(s)
+                        {% if selected_category %} in {{ selected_category_display }}{% endif %}
+                        {% if selected_location %} in {{ selected_location }}{% endif %}
+                        {% if selected_status %} ({{ selected_status|title }}){% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-2.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
+            <!-- Job Listings -->
+            <div class="job-opportunity-wrapper">
+                <div class="row">
+                    {% for job in jobs %}
+                    <!--== Single Job opportunity Start ==-->
+                    <div class="col-lg-4 col-sm-6 text-center">
+                        <div class="single-job-opportunity {% if job.is_new %}job-new{% endif %}">
+                            {% if job.is_new %}
+                            <span class="job-new-badge">NEW</span>
+                            {% endif %}
+                            
+                            <div class="job-opportunity-text">
+                                <div class="job-oppor-logo">
+                                    <div class="display-table">
+                                        <div class="display-table-cell">
+                                            {% if job.company_logo %}
+                                            <img src="{{ job.company_logo.url }}" alt="{{ job.company_name }}" class="img-fluid">
+                                            {% else %}
+                                            <img src="{% static 'assets/images/job/default-logo.png' %}" alt="{{ job.company_name }}" class="img-fluid">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3><a href="">{{ job.title }}</a></h3>
+                                
+                                <!-- Job Meta Info -->
+                                <div class="job-meta-info mb-2">
+                                    <span class="badge badge-info">{{ job.get_job_type_display }}</span>
+                                    {% if job.job_category %}
+                                    <span class="badge badge-secondary">{{ job.get_job_category_display }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p>{{ job.short_description|truncatechars:150 }}</p>
+                                
+                            
+                            </div>
+                            
+                            <!-- Apply Now Button -->
+                            {% if job.is_expired %}
+                            <span class="btn btn-job btn-expired disabled">Expired</span>
+                            {% else %}
+                            <a href="{{ job.application_url }}" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="btn btn-job apply-now-btn"
+                               data-job-id="{{ job.id }}">
+                                <i class="fas fa-paper-plane"></i> Apply now
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!--== Single Job opportunity End ==-->
+                    {% empty %}
+                    <!-- No Jobs Found -->
+                    <div class="col-lg-12 text-center">
+                        <div class="no-jobs-found py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4>No job opportunities found</h4>
+                            <p class="text-muted">
+                                {% if any_filter_active %}
+                                Try adjusting your filters or 
+                                <a href="{% url 'career' %}" class="text-brand">view all jobs</a>
+                                {% else %}
+                                Check back soon for new opportunities
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
 
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-1.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job btn-expired disabled">Expired</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
+                <!-- Pagination -->
+                {% if jobs.paginator.num_pages > 1 %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="pagination-wrap text-center">
+                            <nav>
+                                <ul class="pagination">
+                                    {% if jobs.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ jobs.previous_page_number }}">
+                                            <i class="fa fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="fa fa-angle-left"></i></span>
+                                    </li>
+                                    {% endif %}
 
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-2.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
+                                    {% for num in jobs.paginator.page_range %}
+                                        {% if jobs.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                        {% elif num > jobs.number|add:'-3' and num < jobs.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ num }}">{{ num }}</a>
+                                        </li>
+                                        {% elif num == jobs.paginator.page_range|length and num > jobs.number|add:'2' %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
 
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-3.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job btn-expired disabled">Expired</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
-
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-4.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
-
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-2.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
-
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-3.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job btn-expired disabled">Expired</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
-
-						<!--== Single Job opportunity Start ==-->
-						<div class="col-lg-4 col-sm-6 text-center">
-							<div class="single-job-opportunity">
-								<div class="job-opportunity-text">
-									<div class="job-oppor-logo">
-										<div class="display-table">
-											<div class="display-table-cell">
-												<img src="{% static 'assets/images/job/compnay-logo-4.png' %}" alt="Job">
-											</div>
-										</div>
-									</div>
-									<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-									<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam
-										procsus est etiam procsus dymicus.<a href="#">[...]</a></p>
-								</div>
-								<a href="#" class="btn btn-job">Apply now</a>
-							</div>
-						</div>
-						<!--== Single Job opportunity End ==-->
-					</div>
-
-					<!-- Pagination Start -->
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="pagination-wrap text-center">
-								<nav>
-									<ul class="pagination">
-										<li class="page-item"><a class="page-link" href="#"><i
-											class="fa fa-angle-left"></i></a></li>
-										<li class="page-item active"><a class="page-link" href="#">1</a></li>
-										<li class="page-item"><a class="page-link" href="#">2</a></li>
-										<li class="page-item"><a class="page-link" href="#">3</a></li>
-										<li class="page-item"><a class="page-link" href="#">...</a></li>
-										<li class="page-item"><a class="page-link" href="#">50</a></li>
-										<li class="page-item"><a class="page-link" href="#"><i
-											class="fa fa-angle-right"></i></a></li>
-									</ul>
-								</nav>
-							</div>
-						</div>
-					</div>
-					<!-- Pagination End -->
-				</div>
-			</div>
-		</div>
-	</div>
+                                    {% if jobs.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ jobs.next_page_number }}">
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link"><i class="fa fa-angle-right"></i></span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            
+                            <div class="pagination-info mt-2">
+                                <small class="text-muted">
+                                    Showing {{ jobs.start_index }} to {{ jobs.end_index }} of {{ jobs.paginator.count }} jobs
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </section>
+
+<!-- Add some CSS for better styling -->
+<style>
+    .job-new-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: #28a745;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        z-index: 10;
+    }
+    
+    .single-job-opportunity.job-new {
+        border: 2px solid rgba(40, 167, 69, 0.2);
+        position: relative;
+    }
+    
+    .job-meta-info {
+        margin-top: 10px;
+    }
+    
+    .job-meta-info .badge {
+        margin-right: 5px;
+        font-size: 0.8rem;
+        font-weight: normal;
+    }
+    
+    .job-details-small {
+        font-size: 0.85rem;
+        color: #666;
+        text-align: left;
+        margin-top: 10px;
+    }
+    
+    .job-details-small i {
+        width: 16px;
+        margin-right: 5px;
+    }
+    
+    .no-jobs-found {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 40px !important;
+    }
+    
+    .apply-now-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control {
+        margin-right: 10px;
+        min-width: 150px;
+    }
+</style>

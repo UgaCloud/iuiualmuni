@@ -5,7 +5,10 @@
 		<div class="row">
 			<div class="col-lg-12 text-center">
 				<div class="section-title">
-					<h2>Our gallery</h2>
+					<h2>{{ album.title|default:"Our Gallery" }}</h2>
+					{% if album.description %}
+					<p>{{ album.description }}</p>
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -27,119 +30,35 @@
 
 					<!-- Gallery Item content Start -->
 					<div class="row gallery-gird">
+						{% for image in album.images.all %}
 						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 recent event">
-							<div class="single-gallery-item gallery-bg-1">
+						<div class="col-lg-3 col-sm-6 {% if image.is_featured %}featured{% endif %} {% for tag in image.tags.all %}{{ tag.name|lower }}{% if not forloop.last %} {% endif %}{% endfor %}">
+							{% if image.video_url %}
+							<div class="single-gallery-item video">
+								<a href="{{ image.video_url }}" class="btn btn-video-play video-popup"><i class="fa fa-play"></i></a>
+							</div>
+							{% else %}
+							<div class="single-gallery-item" {% if image.image %}style="background-image: url('{{ image.image.url }}');"{% endif %}>
 								<div class="gallery-hvr-wrap">
 									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
+										<h4>{{ image.title|default:album.title }}</h4>
+										<p class="gallery-event-date">{{ album.album_date|date:"j M, Y" }}</p>
 									</div>
-									<a href="assets/images/gallery/gellary-img-1.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
+									{% if image.image %}
+									<a href="{{ image.image.url }}" class="btn-zoom image-popup">
+										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="zoom">
 									</a>
+									{% else %}
+									<a href="{% static 'assets/images/gallery/gellary-img-1.jpg' %}" class="btn-zoom image-popup">
+										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="zoom">
+									</a>
+									{% endif %}
 								</div>
 							</div>
+							{% endif %}
 						</div>
 						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 old event pic">
-							<div class="single-gallery-item video gallery-bg-2">
-								<a href="https://player.vimeo.com/video/140182080?title=0&portrait=0&byline=0&autoplay=1&loop=1"
-								   class="btn btn-video-play video-popup"><i class="fa fa-play"></i></a>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 recent pic">
-							<div class="single-gallery-item gallery-bg-3">
-								<div class="gallery-hvr-wrap">
-									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
-									</div>
-									<a href="assets/images/gallery/gellary-img-3.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
-									</a>
-								</div>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 old">
-							<div class="single-gallery-item gallery-bg-4">
-								<div class="gallery-hvr-wrap">
-									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
-									</div>
-									<a href="assets/images/gallery/gellary-img-4.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
-									</a>
-								</div>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 pic event">
-							<div class="single-gallery-item gallery-bg-5">
-								<div class="gallery-hvr-wrap">
-									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
-									</div>
-									<a href="assets/images/gallery/gellary-img-5.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
-									</a>
-								</div>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 old recent">
-							<div class="single-gallery-item gallery-bg-6">
-								<div class="gallery-hvr-wrap">
-									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
-									</div>
-									<a href="assets/images/gallery/gellary-img-6.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
-									</a>
-								</div>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 pic">
-							<div class="single-gallery-item video gallery-bg-7">
-								<a href="https://player.vimeo.com/video/181545195?title=0&portrait=0&byline=0&autoplay=1&loop=1"
-								   class="btn btn-video-play video-popup"><i class="fa fa-play"></i></a>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
-
-						<!-- Single Gallery Start -->
-						<div class="col-lg-3  col-sm-6 pic recent old">
-							<div class="single-gallery-item gallery-bg-8">
-								<div class="gallery-hvr-wrap">
-									<div class="gallery-hvr-text">
-										<h4>University Cumpus</h4>
-										<p class="gallery-event-date">28 Oct, 2018</p>
-									</div>
-									<a href="assets/images/gallery/gellary-img-8.jpg" class="btn-zoom image-popup">
-										<img src="{% static 'assets/images/zoom-icon.png' %}" alt="a">
-									</a>
-								</div>
-							</div>
-						</div>
-						<!-- Single Gallery End -->
+						{% endfor %}
 					</div>
 					<!-- Gallery Item content End -->
 				</div>

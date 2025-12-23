@@ -443,3 +443,321 @@ class AuditLogAdmin(admin.ModelAdmin):
 admin.site.site_header = 'Alumni Association System Admin'
 admin.site.site_title = 'Alumni Association System'
 admin.site.index_title = 'Welcome to Alumni Association Administration'
+
+
+# Register new models for Events and Gallery
+from .models import Event, EventRegistration, GalleryAlbum, GalleryImage
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'event_date', 'location', 'event_type', 'is_active', 'is_featured')
+    list_filter = ('event_type', 'is_active', 'is_featured', 'event_date')
+    search_fields = ('title', 'description', 'location')
+    prepopulated_fields = {'slug': ('title',)}
+    date_hierarchy = 'event_date'
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description', 'event_type')
+        }),
+        ('Date & Time', {
+            'fields': ('event_date', 'end_date')
+        }),
+        ('Location', {
+            'fields': ('location', 'venue')
+        }),
+        ('Settings', {
+            'fields': ('image', 'is_active', 'is_featured', 'max_attendees', 'registration_deadline')
+        }),
+        ('Meta', {
+            'fields': ('created_by', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
+
+
+# @admin.register(EventRegistration)
+# class EventRegistrationAdmin(admin.ModelAdmin):
+#     list_display = ('event', 'member', 'status', 'registered_at')
+#     list_filter = ('status', 'registered_at', 'event')
+#     search_fields = ('event__title', 'member__full_name', 'member__email')
+#     date_hierarchy = 'registered_at'
+    
+#     fieldsets = (
+#         ('Registration Details', {
+#             'fields': ('event', 'member', 'status')
+#         }),
+#         ('Timestamps', {
+#             'fields': ('registered_at', 'updated_at'),
+#             'classes': ('collapse',)
+#         }),
+#     )
+    
+#     readonly_fields = ('registered_at', 'updated_at')
+
+
+@admin.register(GalleryAlbum)
+class GalleryAlbumAdmin(admin.ModelAdmin):
+    list_display = ('title', 'album_date', 'is_active', 'is_featured', 'total_images')
+    list_filter = ('is_active', 'is_featured', 'album_date')
+    search_fields = ('title', 'description')
+    prepopulated_fields = {'slug': ('title',)}
+    date_hierarchy = 'album_date'
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'description')
+        }),
+        ('Settings', {
+            'fields': ('event', 'album_date', 'cover_image', 'is_active', 'is_featured')
+        }),
+        ('Meta', {
+            'fields': ('created_by', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
+
+
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'album', 'taken_date', 'is_featured', 'order')
+    list_filter = ('album', 'is_featured', 'taken_date')
+    search_fields = ('title', 'caption', 'album__title')
+    date_hierarchy = 'taken_date'
+    
+    fieldsets = (
+        ('Image Details', {
+            'fields': ('album', 'title', 'image', 'caption')
+        }),
+        ('Settings', {
+            'fields': ('taken_date', 'is_featured', 'order')
+        }),
+        ('Meta', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('created_at',)
+    
+    
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import JobAdvertisement
+
+@admin.register(JobAdvertisement)
+class JobAdvertisementAdmin(admin.ModelAdmin):
+    # Fields to display in the list view
+    list_display = (
+        'id',
+        'company_logo_thumbnail',
+        'title',
+        'company_name',
+        'application_url_link',
+        'is_active',
+        'is_expired',
+        'display_order',
+        'posted_date',
+    )
+    
+    # Fields that can be edited directly in the list view
+    list_editable = ('is_active', 'is_expired', 'display_order')
+    
+    # Fields to filter by in the right sidebar
+    list_filter = ('is_active', 'is_expired', 'posted_date')
+    
+    # Fields to search in the search bar
+    search_fields = ('title', 'company_name', 'short_description')
+    
+    # Number of items per page
+    list_per_page = 20
+    
+    # Ordering by default
+    ordering = ('-display_order', '-posted_date')
+    
+    # Date hierarchy for easy navigation by date
+    date_hierarchy = 'posted_date'
+    
+    # Fields to display in the detail/edit view with sections
+    fieldsets = (
+        ('Basic Information', {
+            'fields': (
+                'title',
+                'company_name',
+                'company_logo',
+                'short_description',
+            ),
+            'classes': ('wide',),
+        }),
+        ('Advertisement Details', {
+            'fields': (
+                'application_url',
+                'display_order',
+            ),
+            'classes': ('wide',),
+        }),
+        ('Status & Visibility', {
+            'fields': (
+                'is_active',
+                'is_expired',
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Timestamps', {
+            'fields': (
+                'posted_date',
+                'created_at',
+                'updated_at',
+            ),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    # Fields that are read-only (automatically set)
+    readonly_fields = ('posted_date', 'created_at', 'updated_at')
+    
+    # Custom method to display logo as thumbnail in list view
+    def company_logo_thumbnail(self, obj):
+        if obj.company_logo:
+            return format_html(
+                '<img src="{}" style="max-height: 50px; max-width: 50px; object-fit: contain;" />',
+                obj.company_logo.url
+            )
+        return "No Logo"
+    company_logo_thumbnail.short_description = 'Logo'
+    company_logo_thumbnail.allow_tags = True
+    
+    # Custom method to display application URL as clickable link
+    def application_url_link(self, obj):
+        if obj.application_url:
+            return format_html(
+                '<a href="{}" target="_blank">{}</a>',
+                obj.application_url,
+                'External Link'
+            )
+        return "No URL"
+    application_url_link.short_description = 'Apply Link'
+    application_url_link.allow_tags = True
+    
+    # Customize the display of active status
+    def get_list_display(self, request):
+        # Add a color-coded status indicator
+        list_display = list(self.list_display)
+        return list_display
+    
+    # Custom actions for the admin
+    actions = ['mark_as_active', 'mark_as_inactive', 'mark_as_expired']
+    
+    def mark_as_active(self, request, queryset):
+        updated = queryset.update(is_active=True, is_expired=False)
+        self.message_user(request, f'{updated} job(s) marked as active.')
+    mark_as_active.short_description = "Mark selected jobs as active"
+    
+    def mark_as_inactive(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} job(s) marked as inactive.')
+    mark_as_inactive.short_description = "Mark selected jobs as inactive"
+    
+    def mark_as_expired(self, request, queryset):
+        updated = queryset.update(is_expired=True, is_active=False)
+        self.message_user(request, f'{updated} job(s) marked as expired.')
+    mark_as_expired.short_description = "Mark selected jobs as expired"
+    
+    # Custom save method to update timestamps
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:  # If creating a new object
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+    
+    # Override the changelist view to add some custom context
+    def changelist_view(self, request, extra_context=None):
+        # Add statistics to the context
+        extra_context = extra_context or {}
+        extra_context['total_jobs'] = JobAdvertisement.objects.count()
+        extra_context['active_jobs'] = JobAdvertisement.objects.filter(is_active=True).count()
+        extra_context['expired_jobs'] = JobAdvertisement.objects.filter(is_expired=True).count()
+        return super().changelist_view(request, extra_context=extra_context)
+    
+    # # Custom templates for better UI (optional)
+    # change_list_template = 'admin/job_advertisement/change_list.html'
+    
+    # # Add some CSS for better display
+    # class Media:
+    #     css = {
+    #         'all': ('admin/css/job_advertisement.css',)
+    #     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

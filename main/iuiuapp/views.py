@@ -13,6 +13,7 @@ from django.views.generic import DetailView
 from django.views.generic.list import ListView
 from django.db import transaction
 from .forms import *
+from django.http import JsonResponse
 
 
 
@@ -323,13 +324,27 @@ def all_members_directory_view(request):
     return render(request, 'members_committee.html', context)
 
 def index(request):
-    context = {}
+
+    jobs = JobAdvertisement.objects.filter(is_active=True).order_by('-display_order', '-posted_date')[:6]
+    
+    # Get the closest upcoming event (the one that is soonest)
+    upcoming_event = Event.objects.filter(
+        event_date__gte=timezone.now(),
+        is_active=True
+    ).order_by('event_date').first()
+    
+    context = {
+        'upcoming_event': upcoming_event,
+        'jobs': jobs,  # Changed from 'job' to 'jobs' to match template variable name
+    }
+    
     if request.user.is_authenticated:
         context['welcome_message'] = f"Welcome back, {request.user.get_short_name()}!"
         if hasattr(request.user, 'member'):
             context['member'] = request.user.member
             context['member_id'] = request.user.member.member_id
-    return render(request, 'index.html')
+    
+    return render(request, 'index.html', context)
 
 def about(request):
     active_leadership = AssociationLeadership.objects.filter(
@@ -359,23 +374,196 @@ def about(request):
     }
     return render(request, 'about.html', context)
 
+
 def event(request):
-    return render(request, 'event.html')
+    # -----------------------------
+    # GET FILTER PARAMS & ACTIVE TAB
+    # -----------------------------
+    year = request.GET.get('year')
+    place = request.GET.get('place')
+    event_type = request.GET.get('type')
+    status = request.GET.get('status')
+    active_tab = request.GET.get('tab', 'active')
+    
+    # -----------------------------
+    # BASE QUERYSETS FOR BOTH TABS
+    # -----------------------------
+    # Get all events first
+    all_events = Event.objects.all()
+    
+    # Apply filters function
+    def apply_filters(queryset):
+        qs = queryset
+        
+        # YEAR FILTER
+        if year and year != 'Year':
+            try:
+                qs = qs.filter(event_date__year=int(year))
+            except ValueError:
+                pass
+        
+        # PLACE FILTER
+        if place and place != 'Place':
+            qs = qs.filter(location__icontains=place)
+        
+        # EVENT TYPE FILTER
+        if event_type and event_type != 'Type':
+            event_type_map = {
+                'Meetup': 'MEETUP',
+                'Seminar': 'SEMINAR',
+                'Get Together': 'GET_TOGETHER',
+                'Workshop': 'WORKSHOP',
+                'Conference': 'CONFERENCE',
+                'Other': 'OTHER',
+            }
+            db_event_type = event_type_map.get(event_type)
+            if db_event_type:
+                qs = qs.filter(event_type=db_event_type)
+        
+        # STATUS FILTER (only if not "All")
+        if status and status != 'Status' and status != 'All':
+            if status == 'Active':
+                qs = qs.filter(is_active=True)
+            elif status == 'Inactive':
+                qs = qs.filter(is_active=False)
+        
+        return qs.order_by('-event_date')
+    
+    # Get filtered active and inactive events
+    active_events_qs = apply_filters(all_events.filter(is_active=True))
+    inactive_events_qs = apply_filters(all_events.filter(is_active=False))
+    
+    # Determine which tab is active and paginate accordingly
+    if active_tab == 'active':
+        # Paginate active events
+        paginator = Paginator(active_events_qs, 3)
+    else:
+        # Paginate inactive events  
+        paginator = Paginator(inactive_events_qs, 3)
+    
+    page_number = request.GET.get('page', 1)
+    
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    
+    # -----------------------------
+    # FILTER DATA
+    # -----------------------------
+    all_years = Event.objects.dates('event_date', 'year', order='DESC')
+    years_list = [y.year for y in all_years]
+    
+    locations = (
+        Event.objects
+        .exclude(location__isnull=True)
+        .exclude(location__exact='')
+        .values_list('location', flat=True)
+        .distinct()
+    )
+    
+    # -----------------------------
+    # CONTEXT
+    # -----------------------------
+    context = {
+        'events': page_obj,  # For backward compatibility with event_list.html
+        'active_events': active_events_qs,  # All filtered active events (no pagination)
+        'inactive_events': inactive_events_qs,  # All filtered inactive events (no pagination)
+        'active_tab': active_tab,
+        'active_count': Event.objects.filter(is_active=True).count(),
+        'inactive_count': Event.objects.filter(is_active=False).count(),
+        'years': years_list,
+        'locations': locations,
+        'now': timezone.now(),
+        'status_filter': status if status and status != 'Status' else None,
+        'year_filter': year if year and year != 'Year' else None,
+        'place_filter': place if place and place != 'Place' else None,
+        'type_filter': event_type if event_type and event_type != 'Type' else None,
+    }
+    
+    return render(request, 'event.html', context)
+
+
+def single_event(request, event_slug):
+    try:
+        event = Event.objects.get(slug=event_slug)
+    except Event.DoesNotExist:
+        from django.http import Http404
+        raise Http404("Event not found")
+    
+    context = {
+        'event': event,
+    }
+    
+    return render(request, 'single-event.html', context)
 
 def contact(request):
     return render(request, 'contact.html')
 
 def gallery(request):
-    return render(request, 'gallery.html')
+    category = request.GET.get('category', 'All')
+    
+    albums = GalleryAlbum.objects.filter(is_active=True).prefetch_related('images')
+    
+    if category != 'All':
+        category_map = {
+            'Seminar': 'SEMINAR',
+            'Event': 'MEETUP', 
+            'Picnic': 'GET_TOGETHER'  
+        }
+        db_event_type = category_map.get(category)
+        if db_event_type:
+            albums = albums.filter(event__event_type=db_event_type)
+    
+   
+    albums = albums.order_by('-album_date')
+    
+  
+    paginator = Paginator(albums, 6) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'albums': page_obj,
+        'current_category': category,
+    }
+    
+    return render(request, 'gallery.html', context)
 
-def gallery_single(request):
-    return render(request, 'single-album.html')
+def gallery_single(request, album_slug=None):
+    if album_slug:
+        try:
+            album = GalleryAlbum.objects.prefetch_related('images').get(slug=album_slug, is_active=True)
+        except GalleryAlbum.DoesNotExist:
+            album = GalleryAlbum.objects.prefetch_related('images').filter(is_active=True).first()
+    else:
+        album = GalleryAlbum.objects.prefetch_related('images').filter(is_active=True).first()
+    
+    if not album:
+        context = {'album': None, 'images': []}
+    else:
+        images = album.images.all().order_by('order', '-created_at')
+        context = {
+            'album': album,
+            'images': images,
+        }
+    
+    return render(request, 'single-album.html', context)
+
+
 
 def directory(request):
     return render(request, 'directory.html')
 
 def career(request):
-    return render(request, 'career.html')
+    # Get only active job advertisements
+    jobs = JobAdvertisement.objects.filter(is_active=True).order_by('-display_order', '-posted_date')[:6]
+    context = {
+        'jobs': jobs,
+    }
+    return render(request, 'career.html', context)
 
 def loginview(request):
     return render(request, 'login.html')

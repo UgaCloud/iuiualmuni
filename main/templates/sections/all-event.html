@@ -1,232 +1,246 @@
 {% load static %}
+
 <section id="page-content-wrap">
-	<div class="event-page-content-wrap section-padding">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="event-filter-area">
-						<form action="index.html" class="form-inline d-flex">
-							<select name="year" id="year">
-								<option selected>Year</option>
-								<option>2018</option>
-								<option>2017</option>
-								<option>2016</option>
-								<option>2015</option>
-								<option>2014</option>
-							</select>
+    <div class="event-page-content-wrap section-padding">
+        <div class="container">
 
-							<select name="place" id="place">
-								<option selected>Place</option>
-								<option>Alabama</option>
-								<option>Alaska</option>
-								<option>Arizona</option>
-								<option>Colorado</option>
-								<option>Delaware</option>
-							</select>
+            <!-- FILTERS -->
+            <!-- <div class="row">
+                <div class="col-lg-12">
+                    <div class="event-filter-area">
+                        <form method="get" class="form-inline d-flex flex-wrap gap-2 align-items-center" id="filterForm">
+                            <input type="hidden" name="tab" id="currentTab" value="{{ active_tab }}">
+                             
+                            <select name="status" class="form-control form-control-sm">
+                                <option value="Status" {% if not status_filter %}selected{% endif %}>Status</option>
+                                <option value="All" {% if status_filter == 'All' %}selected{% endif %}>All</option>
+                                <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+                                <option value="Inactive" {% if status_filter == 'Inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                           
+                             
+                            <select name="year" class="form-control form-control-sm">
+                                <option value="Year" {% if not year_filter %}selected{% endif %}>Year</option>
+                                {% for year in years %}
+                                    <option value="{{ year }}" {% if year_filter == year|stringformat:"i" %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                          
 
-							<select name="type" id="type">
-								<option selected>Type</option>
-								<option>Meetup</option>
-								<option>Seminar</option>
-								<option>Get Together</option>
-							</select>
+                             
+                            <select name="place" class="form-control form-control-sm">
+                                <option value="Place" {% if not place_filter %}selected{% endif %}>Place</option>
+                                {% for location in locations %}
+                                    <option value="{{ location }}" {% if place_filter == location %}selected{% endif %}>{{ location }}</option>
+                                {% endfor %}
+                            </select>
+                            
 
-							<button class="btn btn-brand">Filter</button>
-						</form>
-					</div>
-				</div>
-			</div>
+                            
+                            <select name="type" class="form-control form-control-sm">
+                                <option value="Type" {% if not type_filter %}selected{% endif %}>Type</option>
+                                <option value="Meetup" {% if type_filter == 'Meetup' %}selected{% endif %}>Meetup</option>
+                                <option value="Seminar" {% if type_filter == 'Seminar' %}selected{% endif %}>Seminar</option>
+                                <option value="Get Together" {% if type_filter == 'Get Together' %}selected{% endif %}>Get Together</option>
+                                <option value="Workshop" {% if type_filter == 'Workshop' %}selected{% endif %}>Workshop</option>
+                                <option value="Conference" {% if type_filter == 'Conference' %}selected{% endif %}>Conference</option>
+                                <option value="Other" {% if type_filter == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                            
 
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="all-event-list">
-						<!-- Single Event Start -->
-						<div class="single-upcoming-event">
-							<div class="row">
-								<div class="col-lg-5">
-									<div class="up-event-thumb">
-										<img src="assets/images/event/event-img-1.jpg" class="img-fluid"
-											 alt="Upcoming Event">
-										<h4 class="up-event-date">It’s 27 February 2023</h4>
-									</div>
-								</div>
+                            <button type="submit" class="btn btn-primary btn-sm btn-brand">Filter</button>
+                            <a href="{% url 'event' %}" class="btn btn-outline-secondary btn-sm btn-brand">Clear</a>
+                        </form>
+                    </div>
+                </div>
+            </div> -->
 
-								<div class="col-lg-7">
-									<div class="display-table">
-										<div class="display-table-cell">
-											<div class="up-event-text">
-												<div class="event-countdown">
-													<div class="event-countdown-counter" data-date="2024/9/10"></div>
-													<p>Remaining</p>
-												</div>
-												<h3><a href="single-event.html">We are going to arrange a get
-													together!</a></h3>
-												<p>Hello everybody Lorem ipsum dolor sit amet, consectetur adipisicing
-													elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-													aliqua. Ut enim and minim veniam, quis nostrud exercitation ullamco
-													laboris nisi ut aliquipv ex ea.</p>
-												<a href="single-event.html" class="btn btn-brand btn-brand-dark">join
-													with us</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- Single Event End -->
+            <!-- TABS NAVIGATION -->
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <ul class="nav nav-tabs event-tabs mb-4" id="eventTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if active_tab == 'active' %}active{% endif %}" 
+                                    id="active-tab" 
+                                    data-tab="active"
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="active-events" 
+                                    aria-selected="{% if active_tab == 'active' %}true{% else %}false{% endif %}">
+                                Active Events
+                                <span class="badge bg-primary ms-2">{{ active_count }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if active_tab == 'inactive' %}active{% endif %}" 
+                                    id="inactive-tab" 
+                                    data-tab="inactive"
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="inactive-events" 
+                                    aria-selected="{% if active_tab == 'inactive' %}true{% else %}false{% endif %}">
+                                Passed Events
+                                <span class="badge bg-secondary ms-2">{{ inactive_count }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-						<!-- Single Event Start -->
-						<div class="single-upcoming-event">
-							<div class="row">
-								<div class="col-lg-5">
-									<div class="up-event-thumb">
-										<img src="assets/images/event/event-img-3.jpg" class="img-fluid"
-											 alt="Upcoming Event">
-										<h4 class="up-event-date">It’s 27 February 2023</h4>
-									</div>
-								</div>
+            <!-- TABS CONTENT -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="tab-content" id="eventTabsContent">
+                        <!-- ACTIVE EVENTS TAB -->
+                        <div class="tab-pane {% if active_tab == 'active' %}show active{% endif %}" 
+                             id="active-events" 
+                             role="tabpanel" 
+                             aria-labelledby="active-tab">
+                            <div class="all-event-list">
+                                <!-- Always include active events content -->
+                                {% if active_events %}
+                                    {% with events=active_events %}
+                                        {% include "partials/event_list.html" %}
+                                    {% endwith %}
+                                {% else %}
+                                    <div class="text-center py-5">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-calendar-times fa-lg mb-3"></i>
+                                            <h4>No active events available</h4>
+                                            <p>Check back later for upcoming events</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- INACTIVE EVENTS TAB -->
+                        <div class="tab-pane {% if active_tab == 'inactive' %}show active{% endif %}" 
+                             id="inactive-events" 
+                             role="tabpanel" 
+                             aria-labelledby="inactive-tab">
+                            <div class="all-event-list">
+                                <!-- Always include inactive events content -->
+                                {% if inactive_events %}
+                                    {% with events=inactive_events %}
+                                        {% include "partials/event_list.html" %}
+                                    {% endwith %}
+                                {% else %}
+                                    <div class="text-center py-5">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-calendar-times fa-lg mb-3"></i>
+                                            <h4>No inactive events available</h4>
+                                            <p>There are no past events at the moment</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-								<div class="col-lg-7">
-									<div class="display-table">
-										<div class="display-table-cell">
-											<div class="up-event-text">
-												<div class="event-countdown">
-													<div class="event-countdown-counter" data-date="2024/9/10"></div>
-													<p>Remaining</p>
-												</div>
-												<h3>
-													<a href="single-event.html">
-														We are going to arrange a get together!
-													</a>
-												</h3>
-												<p>
-													Hello everybody Lorem ipsum dolor sit amet, consectetur adipisicing
-													elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-													aliqua. Ut enim and minim veniam, quis nostrud exercitation ullamco
-													laboris nisi ut aliquipv ex ea.
-												</p>
-												<a href="single-event.html" class="btn btn-brand btn-brand-dark">
-													Join with us
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- Single Event End -->
-
-						<!-- Single Event Start -->
-						<div class="single-upcoming-event">
-							<div class="row">
-								<div class="col-lg-5">
-									<div class="up-event-thumb">
-										<img src="assets/images/event/event-img-1.jpg" class="img-fluid"
-											 alt="Upcoming Event">
-										<h4 class="up-event-date">It’s 27 February 2023</h4>
-									</div>
-								</div>
-
-								<div class="col-lg-7">
-									<div class="display-table">
-										<div class="display-table-cell">
-											<div class="up-event-text">
-												<div class="event-countdown">
-													<div class="event-countdown-counter" data-date="2024/9/10"></div>
-													<p>Remaining</p>
-												</div>
-												<h3>
-													<a href="single-event.html">
-														We are going to arrange a get together!
-													</a>
-												</h3>
-												<p>
-													Hello everybody Lorem ipsum dolor sit amet, consectetur adipisicing
-													elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-													aliqua. Ut enim and minim veniam, quis nostrud exercitation ullamco
-													laboris nisi ut aliquipv ex ea.
-												</p>
-												<a href="single-event.html" class="btn btn-brand btn-brand-dark">
-													Join with us
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- Single Event End -->
-
-						<!-- Single Event Start -->
-						<div class="single-upcoming-event">
-							<div class="row">
-								<div class="col-lg-5">
-									<div class="up-event-thumb">
-										<img src="assets/images/event/event-img-4.jpg" class="img-fluid"
-											 alt="Upcoming Event">
-										<h4 class="up-event-date">It’s 27 February 2023</h4>
-									</div>
-								</div>
-
-								<div class="col-lg-7">
-									<div class="display-table">
-										<div class="display-table-cell">
-											<div class="up-event-text">
-												<div class="event-countdown">
-													<div class="event-countdown-counter" data-date="2024/9/10"></div>
-													<p>Remaining</p>
-												</div>
-												<h3>
-													<a href="single-event.html">
-														We are going to arrange a get together!
-													</a>
-												</h3>
-												<p>
-													Hello everybody Lorem ipsum dolor sit amet, consectetur adipisicing
-													elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-													aliqua. Ut enim and minim veniam, quis nostrud exercitation ullamco
-													laboris nisi ut aliquipv ex ea.
-												</p>
-												<a href="single-event.html" class="btn btn-brand btn-brand-dark">join
-													with us</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<!-- Single Event End -->
-					</div>
-				</div>
-			</div>
-
-			<!-- Pagination Start -->
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="pagination-wrap text-center">
-						<nav>
-							<ul class="pagination">
-								<li class="page-item">
-									<a class="page-link" href="#">
-										<i class="fa fa-angle-left"></i>
-									</a>
-								</li>
-								<li class="page-item active"><a class="page-link" href="#">1</a></li>
-								<li class="page-item"><a class="page-link" href="#">2</a></li>
-								<li class="page-item"><a class="page-link" href="#">3</a></li>
-								<li class="page-item"><a class="page-link" href="#">...</a></li>
-								<li class="page-item"><a class="page-link" href="#">50</a></li>
-								<li class="page-item">
-									<a class="page-link" href="#">
-										<i class="fa fa-angle-right"></i>
-									</a>
-								</li>
-							</ul>
-						</nav>
-					</div>
-				</div>
-			</div>
-			<!-- Pagination End -->
-		</div>
-	</div>
+        </div>
+    </div>
 </section>
+
+<style>
+.event-tabs {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.event-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    position: relative;
+    background: none;
+    cursor: pointer;
+    margin-bottom: -2px;
+}
+
+.event-tabs .nav-link:hover {
+    color: #495057;
+    border: none;
+    background-color: rgba(0,0,0,0.02);
+}
+
+.event-tabs .nav-link.active {
+    color: #0dfd21;
+    background: none;
+    border: none;
+    border-bottom: 3px solid #0dfd0d;
+    font-weight: 600;
+}
+
+.event-tabs .nav-link .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.tab-content {
+    padding-top: 1rem;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane.show.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
+
+<!-- LOAD JQUERY FIRST -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+(function($) {
+    $(document).ready(function() {
+        console.log("jQuery loaded and ready!");
+        
+        // Auto-submit form when any select changes
+        $('#filterForm select').on('change', function() {
+            $('#filterForm').submit();
+        });
+        
+        // Handle tab switching - FRONT-END ONLY
+        $('#eventTabs .nav-link').on('click', function(e) {
+            e.preventDefault();
+            
+            const tab = $(this).data('tab');
+            
+            // Don't do anything if clicking the already active tab
+            if ($(this).hasClass('active')) return;
+            
+            // Update URL without reloading
+            updateUrlParameter('tab', tab);
+            
+            // Update hidden input for form submissions
+            $('#currentTab').val(tab);
+            
+            // Update active tab
+            $('#eventTabs .nav-link').removeClass('active');
+            $(this).addClass('active');
+            
+            // Show corresponding content
+            $('.tab-pane').removeClass('show active');
+            $('#' + tab + '-events').addClass('show active');
+        });
+        
+        // Function to update URL parameter without reloading
+        function updateUrlParameter(key, value) {
+            const url = new URL(window.location);
+            url.searchParams.set(key, value);
+            window.history.pushState({}, '', url);
+        }
+    });
+})(jQuery);
+</script>

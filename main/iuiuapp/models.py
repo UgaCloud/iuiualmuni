@@ -753,18 +753,410 @@ class AuditLog(models.Model):
         user_id = self.user.member_id if self.user else 'No User'
         member_id = self.member.member_id if self.member else 'No Member'
         return f"{user_id}/{member_id} - {self.action} - {self.timestamp}"
+
+
+class Event(models.Model):
+    EVENT_TYPES = [
+        ('MEETUP', 'Meetup'),
+        ('SEMINAR', 'Seminar'),
+        ('GET_TOGETHER', 'Get Together'),
+        ('WORKSHOP', 'Workshop'),
+        ('CONFERENCE', 'Conference'),
+        ('OTHER', 'Other'),
+    ]
     
+    title = models.CharField(
+        max_length=200,
+        verbose_name="Event Title"
+    )
     
+    slug = models.SlugField(
+        max_length=200,
+        unique=True,
+        verbose_name="URL Slug"
+    )
     
+    description = models.TextField(
+        verbose_name="Event Description"
+    )
     
+    event_type = models.CharField(
+        max_length=20,
+        choices=EVENT_TYPES,
+        default='MEETUP',
+        verbose_name="Event Type"
+    )
     
+    event_date = models.DateTimeField(
+        verbose_name="Event Date & Time"
+    )
     
+    end_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="End Date & Time"
+    )
     
+    location = models.CharField(
+        max_length=200,
+        verbose_name="Location"
+    )
     
+    venue = models.TextField(
+        blank=True,
+        verbose_name="Venue Details"
+    )
     
+    image = models.ImageField(
+        upload_to='events/',
+        blank=True,
+        null=True,
+        verbose_name="Event Image"
+    )
     
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active Event"
+    )
     
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name="Featured Event"
+    )
     
+    max_attendees = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Maximum Attendees"
+    )
     
+    registration_deadline = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Registration Deadline"
+    )
+    
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_events',
+        verbose_name="Created By"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-event_date']
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
+        indexes = [
+            models.Index(fields=['event_date']),
+            models.Index(fields=['is_active']),
+            models.Index(fields=['is_featured']),
+            models.Index(fields=['event_type']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def is_upcoming(self):
+        return self.event_date > timezone.now()
+    
+    @property
+    def is_past(self):
+        return self.event_date < timezone.now()
+    
+    @property
+    def days_until_event(self):
+        if self.is_upcoming:
+            return (self.event_date.date() - timezone.now().date()).days
+        return 0
+    
+    @property
+    def can_register(self):
+        if not self.is_upcoming:
+            return False
+        if self.registration_deadline:
+            return timezone.now() < self.registration_deadline
+        return True
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Event.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+
+class EventRegistration(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('CONFIRMED', 'Confirmed'),
+        ('CANCELLED', 'Cancelled'),
+        ('ATTENDED', 'Attended'),
+    ]
+    
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name='registrations',
+        verbose_name="Event"
+    )
+    
+    member = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        related_name='event_registrations',
+        verbose_name="Member"
+    )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        verbose_name="Registration Status"
+    )
+    
+    registered_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-registered_at']
+        verbose_name = "Event Registration"
+        verbose_name_plural = "Event Registrations"
+        unique_together = ['event', 'member']
+        indexes = [
+            models.Index(fields=['event', 'status']),
+            models.Index(fields=['member', 'status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.member.full_name} - {self.event.title}"
+
+
+class GalleryAlbum(models.Model):
+    title = models.CharField(
+        max_length=200,
+        verbose_name="Album Title"
+    )
+    
+    slug = models.SlugField(
+        max_length=200,
+        unique=True,
+        verbose_name="URL Slug"
+    )
+    
+    description = models.TextField(
+        blank=True,
+        verbose_name="Album Description"
+    )
+    
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='albums',
+        verbose_name="Related Event"
+    )
+    
+    album_date = models.DateField(
+        default=timezone.now,
+        verbose_name="Album Date"
+    )
+    
+    cover_image = models.ImageField(
+        upload_to='gallery/covers/',
+        blank=True,
+        null=True,
+        verbose_name="Cover Image"
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active Album"
+    )
+    
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name="Featured Album"
+    )
+    
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_albums',
+        verbose_name="Created By"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-album_date']
+        verbose_name = "Gallery Album"
+        verbose_name_plural = "Gallery Albums"
+        indexes = [
+            models.Index(fields=['album_date']),
+            models.Index(fields=['is_active']),
+            models.Index(fields=['is_featured']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    def total_images(self):
+        return self.images.count()
+    total_images.short_description = "Total Images"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while GalleryAlbum.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+
+class GalleryImage(models.Model):
+    album = models.ForeignKey(
+        GalleryAlbum,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name="Album"
+    )
+    
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Image Title"
+    )
+    
+    image = models.ImageField(
+        upload_to='gallery/images/',
+        verbose_name="Image File"
+    )
+    
+    caption = models.TextField(
+        blank=True,
+        verbose_name="Caption"
+    )
+    
+    taken_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Date Taken"
+    )
+    
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name="Featured Image"
+    )
+    
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Display Order"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Gallery Image"
+        verbose_name_plural = "Gallery Images"
+        indexes = [
+            models.Index(fields=['album', 'is_featured']),
+            models.Index(fields=['album', 'order']),
+        ]
+    
+    def __str__(self):
+        return self.title or f"Image in {self.album.title}"    
+    
+
+# models.py
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+
+class JobAdvertisement(models.Model):
+    # Basic Information
+    title = models.CharField(
+        max_length=200,
+        verbose_name="Job Title"
+    )
+    
+    company_name = models.CharField(
+        max_length=200,
+        verbose_name="Company Name"
+    )
+    
+    company_logo = models.ImageField(
+        upload_to='company-logos/',
+        blank=True,
+        null=True,
+        verbose_name="Company Logo"
+    )
+    
+    # Description
+    short_description = models.TextField(
+        verbose_name="Short Description",
+        help_text="Brief description of the job"
+    )
+    
+    # Advertisement Details
+    application_url = models.URLField(
+        max_length=500,
+        verbose_name="Application URL",
+        help_text="External link where candidates can apply"
+    )
+    
+    # Status & Dates
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active Advertisement"
+    )
+    
+    is_expired = models.BooleanField(
+        default=False,
+        verbose_name="Expired"
+    )
+    
+    posted_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Posted Date"
+    )
+    
+    # Display order
+    display_order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Display Order",
+        help_text="Higher number appears first"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-display_order', '-posted_date']
+        verbose_name = "Job Advertisement"
+        verbose_name_plural = "Job Advertisements"
+    
+    def __str__(self):
+        return f"{self.title} - {self.company_name}"
+
+
     
     

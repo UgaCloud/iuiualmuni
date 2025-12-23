@@ -1,146 +1,75 @@
 {% load static %}
 <section id="job-opportunity" class="section-padding">
-	<div class="container">
-		<!--== Section Title Start ==-->
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="section-title">
-					<h2>Recent Jobs</h2>
-				</div>
-			</div>
-		</div>
-		<!--== Section Title End ==-->
+    <div class="container">
+        <!--== Section Title Start ==-->
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="section-title">
+                    <h2>Recent Jobs</h2>
+                </div>
+            </div>
+        </div>
+        <!--== Section Title End ==-->
 
-		<!--== Job opportunity Wrapper ==-->
-		<div class="job-opportunity-wrapper">
-			<div class="row">
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-1.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">Urgently Need Five Data Center Specialist</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job">Apply now</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
+        <!--== Job opportunity Wrapper ==-->
+        <div class="job-opportunity-wrapper">
+            <div class="row">
+                <!-- Dynamic Job Advertisements -->
+                {% for job in jobs %}
+                <!--== Single Job opportunity Start ==-->
+                <div class="col-lg-4 col-sm-6 text-center">
+                    <div class="single-job-opportunity">
+                        <div class="job-opportunity-text">
+                            <div class="job-oppor-logo">
+                                <div class="display-table">
+                                    <div class="display-table-cell">
+                                        {% if job.company_logo %}
+                                            <img src="{{ job.company_logo.url }}" alt="{{ job.company_name }}" class="img-fluid">
+                                        {% else %}
+                                            <!-- Fallback default logo -->
+                                            <img src="{% static 'assets/images/job/default-logo.png' %}" alt="{{ job.company_name }}" class="img-fluid">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <h3><a href="#">{{ job.title }}</a></h3>
+                            <p>{{ job.short_description|truncatechars:150 }}</p>
+                        </div>
+                        
+                        <!-- Apply Now Button - Directs to external URL -->
+                        {% if job.is_expired %}
+                        <span class="btn btn-job btn-expired disabled">Expired</span>
+                        {% else %}
+                        <a href="{{ job.application_url }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="btn btn-job">
+                            Apply now
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--== Single Job opportunity End ==-->
+                {% empty %}
+                <!-- Show message if no jobs available -->
+                <div class="col-lg-12 text-center">
+                    <div class="no-jobs-message">
+                        <i class="fas fa-briefcase fa-3x mb-3"></i>
+                        <h4>No job listings available at the moment</h4>
+                        <p>Check back soon for new opportunities</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-2.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">Product Owner (m/f) for our Charter Business</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job">Apply now</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
-
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-1.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">Backend Developer (Java) (m/f) wanted for leading</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job btn-expired disabled">Expired</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
-
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-2.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">API Architect and Lead - Python, SQLAlchemy, GraphQL</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job">Apply now</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
-
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-3.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">Remotely - Javascript Developer Node.js</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job btn-expired disabled">Expired</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
-
-				<!--== Single Job opportunity Start ==-->
-				<div class="col-lg-4 col-sm-6 text-center">
-					<div class="single-job-opportunity">
-						<div class="job-opportunity-text">
-							<div class="job-oppor-logo">
-								<div class="display-table">
-									<div class="display-table-cell">
-										<img src="{% static 'assets/images/job/compnay-logo-4.png' %}" alt="Job">
-									</div>
-								</div>
-							</div>
-							<h3><a href="#">Five Years Experience Data Center Specialist Needed</a></h3>
-							<p>Claritas est etiam procsus dymicus, qui sequitur mutationem Claritas est etiam procsus
-								est etiam procsus dymicus.<a href="#">[...]</a></p>
-						</div>
-						<a href="#" class="btn btn-job">Apply now</a>
-					</div>
-				</div>
-				<!--== Single Job opportunity End ==-->
-			</div>
-
-			<div class="row">
-				<div class="col-lg-12 text-center">
-					<a href="career.html" class="btn btn-brand btn-loadmore">All job list</a>
-				</div>
-			</div>
-		</div>
-		<!--== Job opportunity Wrapper ==-->
-	</div>
+            {% if jobs %}
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <a href="{% url 'career' %}" class="btn btn-brand btn-loadmore">All job list</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <!--== Job opportunity Wrapper ==-->
+    </div>
 </section>
