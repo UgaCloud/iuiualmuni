@@ -1,0 +1,154 @@
+ValueError at /admin/iuiuapp/jobadvertisement/
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+Request Method:	GET
+Request URL:	https://iuiuaa.org/admin/iuiuapp/jobadvertisement/
+Django Version:	6.0
+Exception Type:	ValueError
+Exception Value:	
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+Exception Location:	/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/db/models/functions/datetime.py, line 354, in convert_value
+Raised during:	iuiuapp.admin.changelist_view
+Python Executable:	/home2/iuiuaaor/virtualenv/public_html/main/3.13/bin/python
+Python Version:	3.13.5
+Python Path:	
+['/home2/iuiuaaor/public_html/main',
+ '',
+ '/home2/iuiuaaor/public_html/main',
+ '/opt/alt/python313/lib64/python313.zip',
+ '/opt/alt/python313/lib64/python3.13',
+ '/opt/alt/python313/lib64/python3.13/lib-dynload',
+ '/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib64/python3.13/site-packages',
+ '/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages']
+Server time:	Wed, 24 Dec 2025 00:22:20 +0300
+Error during template rendering
+In template /home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/jazzmin/templates/admin/change_list.html, error at line 51
+
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+41	                {% block object-tools-items %}
+42	                    {% change_list_object_tools %}
+43	                {% endblock %}
+44	            {% endblock %}
+45	        </div>
+46	    {% endblock %}
+47	
+48	
+49	{% block content %}
+50	
+51	    {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+52	
+53	    {% block search %}
+54	        {% search_form cl %}
+55	    {% endblock %}
+56	
+57	    <div class="col-12">
+58	        <div>
+59	            <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %}enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+60	                <div id="content-main">
+61	                    {% if cl.formset and cl.formset.errors %}
+Traceback Switch to copy-and-paste view
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py, line 55, in inner
+                response = get_response(request)
+                               ^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/core/handlers/base.py, line 221, in _get_response
+                response = response.render()
+                                ^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/response.py, line 114, in render
+            self.content = self.rendered_content
+                                ^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/response.py, line 92, in rendered_content
+        return template.render(context, self._request)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/backends/django.py, line 107, in render
+            return self.template.render(context)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/base.py, line 174, in render
+                    return self._render(context)
+                                ^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/base.py, line 166, in _render
+        return self.nodelist.render(context)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/base.py, line 1091, in render
+        return SafeString("".join([node.render_annotated(context) for node in self]))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/template/base.py, line 1052, in render_annotated
+            return self.render(context)
+                         ^^^^^^^^^^^^^^^^^^^^ …
+Local vars
+
+
+
+
+
+
+
+
+
+ValueError at /admin/iuiuapp/event/
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+Request Method:	GET
+Request URL:	https://iuiuaa.org/admin/iuiuapp/event/
+Django Version:	6.0
+Exception Type:	ValueError
+Exception Value:	
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+Exception Location:	/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/django/db/models/functions/datetime.py, line 354, in convert_value
+Raised during:	django.contrib.admin.options.changelist_view
+Python Executable:	/home2/iuiuaaor/virtualenv/public_html/main/3.13/bin/python
+Python Version:	3.13.5
+Python Path:	
+['/home2/iuiuaaor/public_html/main',
+ '',
+ '/home2/iuiuaaor/public_html/main',
+ '/opt/alt/python313/lib64/python313.zip',
+ '/opt/alt/python313/lib64/python3.13',
+ '/opt/alt/python313/lib64/python3.13/lib-dynload',
+ '/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib64/python3.13/site-packages',
+ '/home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages']
+Server time:	Wed, 24 Dec 2025 00:26:35 +0300
+Error during template rendering
+In template /home2/iuiuaaor/virtualenv/public_html/main/3.13/lib/python3.13/site-packages/jazzmin/templates/admin/change_list.html, error at line 51
+
+Database returned an invalid datetime value. Are time zone definitions for your database installed?
+41	                {% block object-tools-items %}
+42	                    {% change_list_object_tools %}
+43	                {% endblock %}
+44	            {% endblock %}
+45	        </div>
+46	    {% endblock %}
+47	
+48	
+49	{% block content %}
+50	
+51	    {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+52	
+53	    {% block search %}
+54	        {% search_form cl %}
+55	    {% endblock %}
+56	
+57	    <div class="col-12">
+58	        <div>
+59	            <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %}enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+60	                <div id="content-main">
+61	                    {% if cl.formset and cl.formset.errors %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
