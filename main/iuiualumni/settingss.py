@@ -1,25 +1,25 @@
-
-from pathlib import Path
 import os
+from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------------------
+# Base directory
+# ---------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ---------------------------
+# Security
+# ---------------------------
+# SECRET_KEY should be set as environment variable in cPanel Python App
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-default-key-for-dev')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+DEBUG = False  # Must be False in production
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-er$_=3l5zytia55c@jxs24f_-lfreoc(bf5+h&18)(%8p1$tqp'
+ALLOWED_HOSTS = ['iuiuaa.org', 'www.iuiuaa.org']
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
+# ---------------------------
+# Installed apps
+# ---------------------------
 INSTALLED_APPS = [
-
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     'iuiuapp',
 ]
 
+# ---------------------------
+# Middleware
+# ---------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -40,12 +43,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ---------------------------
+# URLs and WSGI
+# ---------------------------
 ROOT_URLCONF = 'iuiualumni.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates') ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -60,67 +66,63 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'iuiualumni.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# ---------------------------
+# Database (Production MySQL)
+# ---------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mysql.connector.django',
+        'NAME': 'iuiuaaor_iuiuaa_sitedb',       # Your cPanel DB name
+        'USER': 'iuiuaaor_site',         # Your cPanel DB user
+        'PASSWORD': 'iuiuAlumni123!',      # Your cPanel DB password
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
-# Add to your settings.py
+# ---------------------------
+# Custom User Model
+# ---------------------------
 AUTH_USER_MODEL = 'iuiuapp.User'
 
-
+# ---------------------------
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# ---------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-
+# ---------------------------
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
+# ---------------------------
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Africa/Kampala'
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-# Media files configuration
-MEDIA_URL = '/media/'  # URL prefix for media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Path where media is stored
-
-
-STATIC_URL = 'static/'
+# ---------------------------
+# Static files
+# ---------------------------
+STATIC_URL = '/main/staticfiles/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic target
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# ---------------------------
+# Media files
+# ---------------------------
+MEDIA_URL = '/main/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+
+
+
+# ---------------------------
+# Default primary key field
+# ---------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Jazzmin Configuration
@@ -140,7 +142,7 @@ JAZZMIN_SETTINGS = {
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": "assets/images/logo/iuiuaa.png",
 
-    # Logo to use for login form in dark themes (defaults to login_logo)
+    # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo_dark": None,
 
     # CSS classes that are applied to the logo above
