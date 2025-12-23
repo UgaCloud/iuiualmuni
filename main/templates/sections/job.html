@@ -1,4 +1,5 @@
 {% load static %}
+{% if jobs %}  <!-- Only show if jobs exist -->
 <section id="job-opportunity" class="section-padding">
     <div class="container">
         <!--== Section Title Start ==-->
@@ -50,26 +51,16 @@
                     </div>
                 </div>
                 <!--== Single Job opportunity End ==-->
-                {% empty %}
-                <!-- Show message if no jobs available -->
-                <div class="col-lg-12 text-center">
-                    <div class="no-jobs-message">
-                        <i class="fas fa-briefcase fa-3x mb-3"></i>
-                        <h4>No job listings available at the moment</h4>
-                        <p>Check back soon for new opportunities</p>
-                    </div>
-                </div>
                 {% endfor %}
             </div>
 
-            {% if jobs %}
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <a href="{% url 'career' %}" class="btn btn-brand btn-loadmore">All job list</a>
                 </div>
             </div>
-            {% endif %}
         </div>
         <!--== Job opportunity Wrapper ==-->
     </div>
 </section>
+{% endif %}  <!-- End of conditional -->

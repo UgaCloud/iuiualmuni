@@ -1089,37 +1089,19 @@ class GalleryImage(models.Model):
 
 
 class JobAdvertisement(models.Model):
-    # Basic Information
     title = models.CharField(max_length=200, verbose_name="Job Title")
     company_name = models.CharField(max_length=200, verbose_name="Company Name")
     company_logo = models.ImageField(upload_to='company-logos/',blank=True,null=True,verbose_name="Company Logo")
-    
     short_description = models.TextField(verbose_name="Short Description",help_text="Brief description of the job")
-    
-    # Advertisement Detailsation_url = models.URLField(max_length=500,verbose_name="Application URL",help_text="External link where candidates can apply")
+    application_url = models.URLField(max_length=500,verbose_name="Application URL",help_text="External link where candidates can apply")
     
     # Status & Dates
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Active Advertisement"
-    )
-    
-    is_expired = models.BooleanField(
-        default=False,
-        verbose_name="Expired"
-    )
-    
-    posted_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Posted Date"
-    )
+    is_active = models.BooleanField(default=True, verbose_name="Active Advertisement")
+    is_expired = models.BooleanField(default=False,verbose_name="Expired")
+    posted_date = models.DateTimeField(auto_now_add=True, verbose_name="Posted Date")
     
     # Display order
-    display_order = models.PositiveIntegerField(
-        default=0,
-        verbose_name="Display Order",
-        help_text="Higher number appears first"
-    )
+    display_order = models.PositiveIntegerField(default=0, verbose_name="Display Order", help_text="Higher number appears first")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
