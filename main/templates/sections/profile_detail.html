@@ -103,10 +103,7 @@
                     <div class="table-responsive">
                         <table class="table table-borderless mb-0">
                             <tbody>
-                                <tr>
-                                    <td class="text-muted" style="width: 40%; padding-left: 2rem;">Student ID</td>
-                                    <td class="fw-bold">{{ profile.student_id }}</td>
-                                </tr>
+                              
                                 <tr>
                                     <td class="text-muted" style="padding-left: 2rem;">Email Address</td>
                                     <td class="fw-bold">
@@ -119,10 +116,7 @@
                                     <td class="text-muted" style="padding-left: 2rem;">Department/Course</td>
                                     <td class="fw-bold">{{ profile.Course|default:"Not Specified" }}</td>
                                 </tr>
-                                <tr>
-                                    <td class="text-muted" style="padding-left: 2rem;">Batch Year</td>
-                                    <td class="fw-bold">{{ profile.batch }}</td>
-                                </tr>
+                               
                                 <tr>
                                     <td class="text-muted" style="padding-left: 2rem;">Campus</td>
                                     <td class="fw-bold">{{ profile.campus_name }}</td>
@@ -174,7 +168,7 @@
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Contact Information -->
-            <div class="card mb-4 border-0 shadow-sm">
+            <!-- <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3">
                     <h3 class="h5 mb-0">
                         <i class="fas fa-address-card me-2" style="color: #198754;"></i> Contact Information
@@ -205,7 +199,7 @@
                     </div>
                     {% endif %}
                     
-                    <!-- Social Links -->
+                 
                     {% if profile.linkedin_url or profile.github_url or profile.portfolio_url %}
                     <div class="mt-4">
                         <h6 class="text-muted mb-3">Connect</h6>
@@ -238,9 +232,9 @@
                     {% endif %}
                 </div>
             </div>
-            
+             -->
             <!-- Profile Status -->
-            <div class="card mb-4 border-0 shadow-sm">
+            <!-- <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3">
                     <h3 class="h5 mb-0">
                         <i class="fas fa-chart-bar me-2" style="color: #198754;"></i> Profile Status
@@ -268,7 +262,7 @@
                       
                     </ul>
                 </div>
-            </div>
+            </div> -->
             
          
         </div>

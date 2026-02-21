@@ -2703,15 +2703,15 @@ blockquote:before,
 }
 
 #slider-area .slide-bg-1 {
-  background-image: url("../images/pagetitle.jpg");
+  background-image: url("../images/iualumnipics/img-1.jpg");
 }
 
 #slider-area .slide-bg-2 {
-  background-image: url("../images/celebrate.jpg");
+  background-image: url("../images/iualumnipics/img-2.jpg");
 }
 
 #slider-area .slide-bg-3 {
-  background-image: url("../images/vulnurable.jpg");
+  background-image: url("../images/iualumnipics/img-4.jpg");
 }
 
 #slider-area .social-networks-icon {
@@ -4425,7 +4425,7 @@ blockquote:before,
 /*--== Page Title Area Start ==--*/
 
 #page-title-area {
-  background-image: url("../images/celebrate.jpg ");
+  background-image: url("../images/iualumnipics/img-5.jpg ");
   background-size: cover;
   background-position: center center;
   position: relative;
