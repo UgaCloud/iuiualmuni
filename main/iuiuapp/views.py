@@ -384,26 +384,29 @@ def index(request):
     
     return render(request, 'index.html', context)
 
+
 def about(request):
     active_leadership = AssociationLeadership.objects.filter(
         is_active=True
     ).select_related(
-        'user__member__profile',
+        'member',  # Changed from 'user__member' to just 'member'
+        'member__profile',  # Directly access profile through member
         'position'
     ).order_by('position__order')
     
     # Create a list of tuples with leader and profile
     leaders_with_profiles = []
     for leader in active_leadership:
-        # Get the profile for this leader's member
-        try:
-            profile = Profile.objects.get(member=leader.user.member, is_public=True)
-        except Profile.DoesNotExist:
-            profile = None
+        # Get the profile for this leader's member (already loaded with select_related)
+        profile = leader.member.profile if hasattr(leader.member, 'profile') and leader.member.profile.is_public else None
         
         leaders_with_profiles.append({
             'leader': leader,
-            'profile': profile
+            'profile': profile,
+            'full_name': leader.member.full_name,
+            'position': leader.position.display_title,
+            'photo': leader.member.profile.photo if profile else None,
+            'bio': leader.member.profile.bio if profile else None,
         })
     
     context = {
