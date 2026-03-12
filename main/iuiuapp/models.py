@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django_ckeditor_5.fields import CKEditor5Field
 from .managers import CustomUserManager
 import random
 import string
@@ -19,76 +20,22 @@ def generate_student_id():
 
 
 class Member(models.Model):
-    member_id = models.CharField(
-        max_length=30,
-        unique=True,
-        editable=False,
-        verbose_name="Member ID"
-    )
-    
-    full_name = models.CharField(
-        max_length=150,
-        verbose_name="Full Name"
-    )
-    
-    email = models.EmailField(
-        unique=True,
-        verbose_name="Email Address"
-    )
-    
-    student_id = models.CharField(
-        max_length=30,
-        blank=True,
-        null=True,
-        verbose_name="Student ID"
-    )
-    
-    course = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="Course/Department"
-    )
-    
-    batch = models.CharField(
-        max_length=10,
-        verbose_name="Batch Year"
-    )
-    
-    graduation_year = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Graduation Year"
-    )
-    
+    member_id = models.CharField(max_length=30, unique=True, editable=False,verbose_name="Member ID")
+    full_name = models.CharField(max_length=150,verbose_name="Full Name")
+    email = models.EmailField(unique=True, verbose_name="Email Address" )
+    student_id = models.CharField(max_length=30, blank=True, null=True, verbose_name="Student ID")
+    course = models.CharField(max_length=100, blank=True, verbose_name="Course/Department")
+    batch = models.CharField(max_length=10, verbose_name="Batch Year")
+    graduation_year = models.PositiveIntegerField( null=True, blank=True, verbose_name="Graduation Year")
     phone = models.CharField(max_length=20, blank=True, verbose_name="Phone Number")
     address = models.TextField(blank=True, verbose_name="Address")
-    
-    current_job = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="Current Job/Position"
-    )
-    
-    current_company = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="Current Company/Organization"
-    )
-    
+    current_job = models.CharField(max_length=200, blank=True, verbose_name="Current Job/Position")
+    current_company = models.CharField( max_length=200,blank=True, verbose_name="Current Company/Organization")
     linkedin_url = models.URLField(blank=True, verbose_name="LinkedIn Profile")
     github_url = models.URLField(blank=True, verbose_name="GitHub Profile")
     portfolio_url = models.URLField(blank=True, verbose_name="Portfolio Website")
-    
-    is_active_member = models.BooleanField(
-        default=True,
-        verbose_name="Active Member"
-    )
-    
-    joined_date = models.DateField(
-        default=timezone.now,
-        verbose_name="Member Since"
-    )
-    
+    is_active_member = models.BooleanField( default=True, verbose_name="Active Member")
+    joined_date = models.DateField( default=timezone.now, verbose_name="Member Since")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -124,6 +71,18 @@ class Member(models.Model):
     @property
     def is_user(self):
         return hasattr(self, 'user_account')
+    
+    @property
+    def is_association_leader(self):
+        return self.leadership_assignments.filter(is_active=True).exists()
+    
+    @property
+    def current_leadership_assignment(self):
+        return self.leadership_assignments.filter(is_active=True).first()
+    
+    @property
+    def leadership_history(self):
+        return self.leadership_assignments.all().order_by('-start_date')
     
     def create_user_account(self, password=None):
         from django.contrib.auth.hashers import make_password
@@ -357,17 +316,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def member_id(self):
         return self.member.member_id
     
-    @property
-    def is_association_leader(self):
-        return self.leadership_assignments.filter(is_active=True).exists()
-    
-    @property
-    def current_leadership_assignment(self):
-        return self.leadership_assignments.filter(is_active=True).first()
-    
-    @property
-    def leadership_history(self):
-        return self.leadership_assignments.all().order_by('-start_date')
     
     @property
     def active_committees(self):
@@ -403,41 +351,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class AssociationLeadership(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='leadership_assignments',
-        verbose_name="Leader"
-    )
-    
-    position = models.ForeignKey(
-        LeadershipPosition,
-        on_delete=models.CASCADE,
-        related_name='assignments',
-        verbose_name="Leadership Position"
-    )
-    
-    start_date = models.DateField(
-        default=timezone.now,
-        verbose_name="Start Date"
-    )
-    
-    end_date = models.DateField(
-        null=True,
-        blank=True,
-        verbose_name="End Date"
-    )
-    
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Currently Active"
-    )
-    
-    notes = models.TextField(
-        blank=True,
-        verbose_name="Notes"
-    )
-    
+    member = models.ForeignKey( Member, on_delete=models.CASCADE, related_name='leadership_assignments', verbose_name="Leader")
+    position = models.ForeignKey(LeadershipPosition, on_delete=models.CASCADE, related_name='assignments', verbose_name="Leadership Position")
+    start_date = models.DateField( default=timezone.now, verbose_name="Start Date")
+    end_date = models.DateField(null=True, blank=True, verbose_name="End Date")
+    is_active = models.BooleanField( default=True, verbose_name="Currently Active")
+    notes = models.TextField( blank=True, verbose_name="Notes" )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -448,12 +367,12 @@ class AssociationLeadership(models.Model):
         indexes = [
             models.Index(fields=['is_active']),
             models.Index(fields=['start_date', 'end_date']),
-            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['member', 'is_active']),
         ]
     
     def __str__(self):
         status = "Active" if self.is_active else "Past"
-        return f"{self.user.full_name} - {self.position.display_title} ({status})"
+        return f"{self.member.full_name} - {self.position.display_title} ({status})"
     
     def clean(self):
         if self.is_active and self.position_id:
@@ -467,15 +386,15 @@ class AssociationLeadership(models.Model):
                     f"Only one active {self.position.display_title} can exist at a time."
                 )
         
-        if self.is_active and self.user_id:
-            user_active_positions = AssociationLeadership.objects.filter(
-                user_id=self.user_id,
+        if self.is_active and self.member_id:
+            member_active_positions = AssociationLeadership.objects.filter(
+                member_id=self.member_id,
                 is_active=True
             ).exclude(id=self.id)
             
-            if user_active_positions.exists():
+            if member_active_positions.exists():
                 raise ValidationError(
-                    f"{self.user.full_name if hasattr(self, 'user') else 'This user'} already holds an active leadership position."
+                    f"{self.member.full_name if hasattr(self, 'member') else 'This member'} already holds an active leadership position."
                 )
         
         if self.end_date and self.start_date and self.end_date < self.start_date:
@@ -498,38 +417,32 @@ class CommitteeMembership(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='committee_memberships',
-        verbose_name="Member"
+        verbose_name="User"
     )
-    
     committee = models.ForeignKey(
         Committee,
         on_delete=models.CASCADE,
         related_name='members',
         verbose_name="Committee"
     )
-    
     role = models.CharField(
         max_length=100,
         default="Member",
         verbose_name="Role in Committee"
     )
-    
     start_date = models.DateField(
         default=timezone.now,
         verbose_name="Start Date"
     )
-    
     end_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="End Date"
     )
-    
     is_active = models.BooleanField(
         default=True,
         verbose_name="Active Membership"
     )
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -561,42 +474,12 @@ class Profile(models.Model):
         ('P', 'Prefer not to say'),
     ]
     
-    member = models.OneToOneField(
-        Member,
-        on_delete=models.CASCADE,
-        related_name='profile',
-        verbose_name="Member"
-    )
-    
-    gender = models.CharField(
-        max_length=1,
-        choices=GENDER_CHOICES,
-        default='P',
-        verbose_name="Gender"
-    )
-    
-    campus = models.ForeignKey(
-        Campus,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='profiles',
-        verbose_name="Campus"
-    )
-    
+    member = models.OneToOneField(Member, on_delete=models.CASCADE, related_name='profile',verbose_name="Member")
+    gender = models.CharField( max_length=1, choices=GENDER_CHOICES, default='P', verbose_name="Gender")
+    campus = models.ForeignKey( Campus, on_delete=models.SET_NULL, null=True, blank=True, related_name='profiles',verbose_name="Campus")
     bio = models.TextField(blank=True, verbose_name="Biography")
-    photo = models.ImageField(
-        upload_to='profiles/',
-        blank=True,
-        null=True,
-        verbose_name="Profile Photo"
-    )
-    
-    is_public = models.BooleanField(
-        default=True,
-        verbose_name="Public Profile"
-    )
-    
+    photo = models.ImageField(upload_to='profiles/', blank=True, null=True,verbose_name="Profile Photo")
+    is_public = models.BooleanField( default=True, verbose_name="Public Profile")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -638,20 +521,17 @@ class Profile(models.Model):
     
     @property
     def is_association_leader(self):
-        if self.member.is_user:
-            return self.member.user_account.is_association_leader
-        return False
+        return self.member.is_association_leader
     
     @property
     def current_leadership_info(self):
-        if self.member.is_user:
-            assignment = self.member.user_account.current_leadership_assignment
-            if assignment:
-                return {
-                    'title': assignment.position.display_title,
-                    'start_date': assignment.start_date,
-                    'is_current': assignment.is_current
-                }
+        assignment = self.member.current_leadership_assignment
+        if assignment:
+            return {
+                'title': assignment.position.display_title,
+                'start_date': assignment.start_date,
+                'is_current': assignment.is_current
+            }
         return None
     
     def save(self, *args, **kwargs):
@@ -705,38 +585,12 @@ class AuditLog(models.Model):
         ('USER_CREATE', 'User Account Created'),
     ]
     
-    user = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='audit_logs',
-        verbose_name="User"
-    )
-    
-    member = models.ForeignKey(
-        Member,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='audit_logs',
-        verbose_name="Member"
-    )
-    
-    action = models.CharField(
-        max_length=50,
-        choices=ACTION_CHOICES,
-        verbose_name="Action"
-    )
-    
+    user = models.ForeignKey( User,on_delete=models.SET_NULL, null=True, related_name='audit_logs', verbose_name="User")
+    member = models.ForeignKey( Member, on_delete=models.SET_NULL, null=True, related_name='audit_logs', verbose_name="Member")
+    action = models.CharField( max_length=50, choices=ACTION_CHOICES, verbose_name="Action")
     details = models.JSONField(default=dict, verbose_name="Action Details")
-    
-    ip_address = models.GenericIPAddressField(
-        null=True,
-        blank=True,
-        verbose_name="IP Address"
-    )
-    
+    ip_address = models.GenericIPAddressField( null=True, blank=True, verbose_name="IP Address")
     user_agent = models.TextField(blank=True, verbose_name="User Agent")
-    
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Timestamp")
     
     class Meta:
@@ -765,75 +619,20 @@ class Event(models.Model):
         ('OTHER', 'Other'),
     ]
     
-    title = models.CharField(
-        max_length=200,
-        verbose_name="Event Title"
-    )
+    title = models.CharField(max_length=200, verbose_name="Event Title")
+    slug = models.SlugField( max_length=200, unique=True, verbose_name="URL Slug")
+    description = models.TextField( verbose_name="Event Description" )
+    event_type = models.CharField( max_length=20, choices=EVENT_TYPES, default='MEETUP', verbose_name="Event Type")
+    event_date = models.DateTimeField( verbose_name="Event Date & Time")
+    end_date = models.DateTimeField( null=True, blank=True, verbose_name="End Date & Time")
+    location = models.CharField( max_length=200, verbose_name="Location")
+    venue = models.TextField( blank=True, verbose_name="Venue Details")
+    image = models.ImageField( upload_to='events/', blank=True, null=True, verbose_name="Event Image" )
     
-    slug = models.SlugField(
-        max_length=200,
-        unique=True,
-        verbose_name="URL Slug"
-    )
-    
-    description = models.TextField(
-        verbose_name="Event Description"
-    )
-    
-    event_type = models.CharField(
-        max_length=20,
-        choices=EVENT_TYPES,
-        default='MEETUP',
-        verbose_name="Event Type"
-    )
-    
-    event_date = models.DateTimeField(
-        verbose_name="Event Date & Time"
-    )
-    
-    end_date = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="End Date & Time"
-    )
-    
-    location = models.CharField(
-        max_length=200,
-        verbose_name="Location"
-    )
-    
-    venue = models.TextField(
-        blank=True,
-        verbose_name="Venue Details"
-    )
-    
-    image = models.ImageField(
-        upload_to='events/',
-        blank=True,
-        null=True,
-        verbose_name="Event Image"
-    )
-    
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Active Event"
-    )
-    
-    is_featured = models.BooleanField(
-        default=False,
-        verbose_name="Featured Event"
-    )
-    
-    max_attendees = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Maximum Attendees"
-    )
-    
-    registration_deadline = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Registration Deadline"
+    is_active = models.BooleanField( default=True, verbose_name="Active Event")
+    is_featured = models.BooleanField(default=False, verbose_name="Featured Event")
+    max_attendees = models.PositiveIntegerField( null=True, blank=True, verbose_name="Maximum Attendees")
+    registration_deadline = models.DateTimeField(null=True, blank=True,verbose_name="Registration Deadline"
     )
     
     created_by = models.ForeignKey(
@@ -1087,7 +886,6 @@ class GalleryImage(models.Model):
     
 
 
-
 class JobAdvertisement(models.Model):
     title = models.CharField(max_length=200, verbose_name="Job Title")
     company_name = models.CharField(max_length=200, verbose_name="Company Name")
@@ -1113,15 +911,86 @@ class JobAdvertisement(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.company_name}"
-    
-    
-    
-    
-    
-    
-    
-    
 
 
+
+# Blog Category Model
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
     
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        ordering = ['name']
+        verbose_name = "Blog Category"
+        verbose_name_plural = "Blog Categories"
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+
+class BlogPost(models.Model):
+    STATUS_CHOICES = [
+        ('DRAFT', 'Draft'),
+        ('PUBLISHED', 'Published'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    category = models.ForeignKey( BlogCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='blog_posts')
+    slug = models.SlugField(max_length=200, unique=True)
+    content = CKEditor5Field('Content', config_name='default')
+    excerpt = models.TextField(max_length=500, blank=True, help_text="Short summary of the post")
+    featured_image = models.ImageField(upload_to='blog/', blank=True, null=True)
+    
+    # Link to User (admin users)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='blog_posts'
+    )
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='DRAFT')
+    published_date = models.DateTimeField(null=True, blank=True)
+    views_count = models.PositiveIntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-published_date', '-created_at']
+        verbose_name = "Blog Post"
+        verbose_name_plural = "Blog Posts"
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        
+        if self.status == 'PUBLISHED' and not self.published_date:
+            self.published_date = timezone.now()
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def is_published(self):
+        return self.status == 'PUBLISHED' and self.published_date

@@ -1,8 +1,11 @@
 from django.contrib import admin
+from django.db import models
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
+from django.utils import timezone
 from django import forms
-from .models import Member, User, Profile, Role, Campus, AuditLog, Committee, CommitteeMembership, LeadershipPosition, AssociationLeadership
+from django_ckeditor_5.widgets import CKEditor5Widget
+from .models import *
 
 
 class UserCreationForm(forms.ModelForm):
@@ -32,7 +35,6 @@ class UserCreationForm(forms.ModelForm):
     def save_m2m(self):
         # No-op since add form doesn't handle m2m fields
         pass
-
 
 
 class ProfileInline(admin.StackedInline):
@@ -107,7 +109,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     
-    inlines = [CommitteeMembershipInline, AssociationLeadershipInline]
+    inlines = [CommitteeMembershipInline]
     
     readonly_fields = ('date_joined', 'last_login', 'updated_at')
     
@@ -117,7 +119,9 @@ class UserAdmin(BaseUserAdmin):
         return super().get_inline_instances(request, obj)
     
     def is_association_leader_display(self, obj):
-        return obj.is_association_leader
+        if hasattr(obj, 'member'):
+            return obj.member.is_association_leader
+        return False
     is_association_leader_display.short_description = 'Association Leader'
     is_association_leader_display.boolean = True
     
@@ -177,7 +181,7 @@ class MemberAdmin(admin.ModelAdmin):
     has_user_account.short_description = 'Has User Account'
     has_user_account.boolean = True
     
-    inlines = [ProfileInline]
+    inlines = [ProfileInline, AssociationLeadershipInline]
     
     def get_inline_instances(self, request, obj=None):
         if not obj:
@@ -247,8 +251,8 @@ class ProfileAdmin(admin.ModelAdmin):
     
     def is_association_leader_field(self, obj):
         if obj.is_association_leader:
-            if hasattr(obj.member, 'user_account'):
-                assignment = obj.member.user_account.current_leadership_assignment
+            if obj.member.is_user:
+                assignment = obj.member.current_leadership_assignment
                 if assignment:
                     return f"Yes - {assignment.position.display_title}"
         return "No"
@@ -344,7 +348,7 @@ class CommitteeAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     
     def member_count(self, obj):
-        return obj.members.filter(committeemembership__is_active=True).count()
+        return obj.members.filter(is_active=True).count()
     member_count.short_description = 'Active Members'
 
 
@@ -369,7 +373,7 @@ class LeadershipPositionAdmin(admin.ModelAdmin):
     def current_leader(self, obj):
         assignment = obj.assignments.filter(is_active=True).first()
         if assignment:
-            return assignment.user.full_name
+            return assignment.member.full_name
         return "Vacant"
     current_leader.short_description = 'Current Leader'
     
@@ -380,12 +384,12 @@ class LeadershipPositionAdmin(admin.ModelAdmin):
 
 @admin.register(AssociationLeadership)
 class AssociationLeadershipAdmin(admin.ModelAdmin):
-    list_display = ('user', 'position_display', 'start_date', 'end_date', 'is_active', 'is_current')
+    list_display = ('member', 'position_display', 'start_date', 'end_date', 'is_active', 'is_current')
     list_filter = ('is_active', 'position', 'start_date')
-    search_fields = ('user__full_name', 'user__member__member_id', 'position__code', 'notes')
+    search_fields = ('member__full_name', 'member__member_id', 'position__code', 'notes')
     readonly_fields = ('created_at', 'updated_at')
     ordering = ('position__order', '-start_date')
-    autocomplete_fields = ['user', 'position']
+    autocomplete_fields = ['member', 'position']
     
     def position_display(self, obj):
         return obj.position.display_title
@@ -399,7 +403,7 @@ class AssociationLeadershipAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Leadership Assignment', {
-            'fields': ('user', 'position', 'is_active')
+            'fields': ('member', 'position', 'is_active')
         }),
         ('Term Details', {
             'fields': ('start_date', 'end_date', 'notes')
@@ -440,14 +444,6 @@ class AuditLogAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.site_header = 'Alumni Association System Admin'
-admin.site.site_title = 'Alumni Association System'
-admin.site.index_title = 'Welcome to Alumni Association Administration'
-
-
-# Register new models for Events and Gallery
-from .models import Event, EventRegistration, GalleryAlbum, GalleryImage
-
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('title', 'event_date', 'location', 'event_type', 'is_active', 'is_featured')
@@ -478,24 +474,24 @@ class EventAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
 
-# @admin.register(EventRegistration)
-# class EventRegistrationAdmin(admin.ModelAdmin):
-#     list_display = ('event', 'member', 'status', 'registered_at')
-#     list_filter = ('status', 'registered_at', 'event')
-#     search_fields = ('event__title', 'member__full_name', 'member__email')
-#     date_hierarchy = 'registered_at'
+@admin.register(EventRegistration)
+class EventRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('event', 'member', 'status', 'registered_at')
+    list_filter = ('status', 'registered_at', 'event')
+    search_fields = ('event__title', 'member__full_name', 'member__email')
+    date_hierarchy = 'registered_at'
     
-#     fieldsets = (
-#         ('Registration Details', {
-#             'fields': ('event', 'member', 'status')
-#         }),
-#         ('Timestamps', {
-#             'fields': ('registered_at', 'updated_at'),
-#             'classes': ('collapse',)
-#         }),
-#     )
+    fieldsets = (
+        ('Registration Details', {
+            'fields': ('event', 'member', 'status')
+        }),
+        ('Timestamps', {
+            'fields': ('registered_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
     
-#     readonly_fields = ('registered_at', 'updated_at')
+    readonly_fields = ('registered_at', 'updated_at')
 
 
 @admin.register(GalleryAlbum)
@@ -543,15 +539,10 @@ class GalleryImageAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ('created_at',)
-    
-    
-from django.contrib import admin
-from django.utils.html import format_html
-from .models import JobAdvertisement
+
 
 @admin.register(JobAdvertisement)
 class JobAdvertisementAdmin(admin.ModelAdmin):
-    # Fields to display in the list view
     list_display = (
         'id',
         'company_logo_thumbnail',
@@ -564,25 +555,13 @@ class JobAdvertisementAdmin(admin.ModelAdmin):
         'posted_date',
     )
     
-    # Fields that can be edited directly in the list view
     list_editable = ('is_active', 'is_expired', 'display_order')
-    
-    # Fields to filter by in the right sidebar
     list_filter = ('is_active', 'is_expired', 'posted_date')
-    
-    # Fields to search in the search bar
     search_fields = ('title', 'company_name', 'short_description')
-    
-    # Number of items per page
     list_per_page = 20
-    
-    # Ordering by default
     ordering = ('-display_order', '-posted_date')
-    
-    # Date hierarchy for easy navigation by date
     date_hierarchy = 'posted_date'
     
-    # Fields to display in the detail/edit view with sections
     fieldsets = (
         ('Basic Information', {
             'fields': (
@@ -617,10 +596,8 @@ class JobAdvertisementAdmin(admin.ModelAdmin):
         }),
     )
     
-    # Fields that are read-only (automatically set)
     readonly_fields = ('posted_date', 'created_at', 'updated_at')
     
-    # Custom method to display logo as thumbnail in list view
     def company_logo_thumbnail(self, obj):
         if obj.company_logo:
             return format_html(
@@ -629,27 +606,17 @@ class JobAdvertisementAdmin(admin.ModelAdmin):
             )
         return "No Logo"
     company_logo_thumbnail.short_description = 'Logo'
-    company_logo_thumbnail.allow_tags = True
     
-    # Custom method to display application URL as clickable link
     def application_url_link(self, obj):
         if obj.application_url:
             return format_html(
                 '<a href="{}" target="_blank">{}</a>',
                 obj.application_url,
-                'External Link'
+                'Apply'
             )
         return "No URL"
     application_url_link.short_description = 'Apply Link'
-    application_url_link.allow_tags = True
     
-    # Customize the display of active status
-    def get_list_display(self, request):
-        # Add a color-coded status indicator
-        list_display = list(self.list_display)
-        return list_display
-    
-    # Custom actions for the admin
     actions = ['mark_as_active', 'mark_as_inactive', 'mark_as_expired']
     
     def mark_as_active(self, request, queryset):
@@ -667,97 +634,84 @@ class JobAdvertisementAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} job(s) marked as expired.')
     mark_as_expired.short_description = "Mark selected jobs as expired"
     
-    # Custom save method to update timestamps
     def save_model(self, request, obj, form, change):
         if not obj.pk:  # If creating a new object
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
     
-    # Override the changelist view to add some custom context
     def changelist_view(self, request, extra_context=None):
-        # Add statistics to the context
         extra_context = extra_context or {}
         extra_context['total_jobs'] = JobAdvertisement.objects.count()
         extra_context['active_jobs'] = JobAdvertisement.objects.filter(is_active=True).count()
         extra_context['expired_jobs'] = JobAdvertisement.objects.filter(is_expired=True).count()
         return super().changelist_view(request, extra_context=extra_context)
-    
-    # # Custom templates for better UI (optional)
-    # change_list_template = 'admin/job_advertisement/change_list.html'
-    
-    # # Add some CSS for better display
-    # class Media:
-    #     css = {
-    #         'all': ('admin/css/job_advertisement.css',)
-    #     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+# Blog Category Admin
+@admin.register(BlogCategory)
+class BlogCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'is_active', 'post_count', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'description')
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('is_active',)
+    ordering = ('name',)
+    
+    def post_count(self, obj):
+        from .models import BlogPost
+        return BlogPost.objects.filter(category=obj).count()
+    post_count.short_description = 'Posts'
+
+
+# Simple Blog Admin with CKEditor
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'status', 'published_date', 'views_count', 'created_at')
+    list_filter = ('status', 'created_at', 'published_date')
+    search_fields = ('title', 'content', 'excerpt', 'author__full_name')
+    prepopulated_fields = {'slug': ('title',)}
+    date_hierarchy = 'published_date'
+    ordering = ('-published_date', '-created_at')
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'author', 'category', 'excerpt', 'featured_image')
+        }),
+        ('Content', {
+            'fields': ('content',),
+            'classes': ('wide',),
+        }),
+        ('Status', {
+            'fields': ('status', 'published_date', 'views_count')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('views_count', 'created_at', 'updated_at')
+    autocomplete_fields = ['author']
+    
+    # Make content field use CKEditor
+    formfield_overrides = {
+        models.TextField: {'widget': CKEditor5Widget(config_name='default')}
+    }
+    
+    actions = ['publish_posts', 'draft_posts']
+    
+    def publish_posts(self, request, queryset):
+        updated = queryset.update(status='PUBLISHED', published_date=timezone.now())
+        self.message_user(request, f'{updated} post(s) published.')
+    publish_posts.short_description = "Publish selected posts"
+    
+    def draft_posts(self, request, queryset):
+        updated = queryset.update(status='DRAFT')
+        self.message_user(request, f'{updated} post(s) moved to draft.')
+    draft_posts.short_description = "Move selected posts to draft"
+
+
+# Site headers
+admin.site.site_header = 'Alumni Association System Admin'
+admin.site.site_title = 'Alumni Association System'
+admin.site.index_title = 'Welcome to Alumni Association Administration'

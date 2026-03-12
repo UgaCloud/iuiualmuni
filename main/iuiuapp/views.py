@@ -213,6 +213,44 @@ def association_heads_view(request):
 
 
 
+def blog_list(request):
+    # Get all published blog posts
+    posts = BlogPost.objects.filter(status='PUBLISHED').select_related('author__member', 'category')
+    
+    # Get all active categories for sidebar
+    categories = BlogCategory.objects.filter(is_active=True)
+    
+    context = {
+        'posts': posts,
+        'categories': categories,
+    }
+    return render(request, 'blog.html', context)
+
+def blogsingle(request, slug):
+    # Get single blog post by slug
+    post = get_object_or_404(BlogPost, slug=slug, status='PUBLISHED')
+    
+    # Increment view count
+    post.views_count += 1
+    post.save(update_fields=['views_count'])
+    
+    # Get categories for sidebar
+    categories = BlogCategory.objects.filter(is_active=True)
+    
+    context = {
+        'post': post,
+        'categories': categories,
+    }
+    return render(request, 'single-blog.html', context)
+
+
+
+
+# def blogsingle_nosidebar(request):
+#     return render (request, 'single-blog-nosidebar.html')
+
+# def blogsingle_leftsidebar(request):
+#     return render (request, 'single-blog-leftsidebar.html')
 
 
 def committee_heads_view(request):

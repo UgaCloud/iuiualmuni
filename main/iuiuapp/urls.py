@@ -18,6 +18,10 @@ urlpatterns = [
     path('single-album/<slug:album_slug>/', views.gallery_single, name='gallery_single_slug'),
     path('directory/', views.event, name = 'directory'),
     path('career/', views.career, name='career'),
+    path('blog/', views.blog_list, name='blog_list'),
+    path('blog/<slug:slug>/', views.blogsingle, name='blog_single'),
+    # path('blog-single-nosidebar/', views.blogsingle_nosidebar, name='blog-single-nosidebar'),
+    # path('blog-left/', views.blogsingle_leftsidebar, name='blog-single-leftsidebar'),
     
 
     path('association-heads/', views.association_heads_view, name='association_heads'),

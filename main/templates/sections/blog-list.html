@@ -6,298 +6,102 @@
 				<!-- Blog content Area Start -->
 				<div class="col-lg-8">
 					<div class="blog-page-contant-start">
-						<div class="row">
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-1.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3><a href="single-blog.html">
-											Recently we create a maassive project that will
-											be a.....
-										</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
+						<!-- Search/Filter Info Bar -->
+						<div class="row mb-4">
+							<div class="col-12">
+								<div class="filter-info-bar d-flex justify-content-between align-items-center">
+									<div>
+										<span id="post-count">{{ posts|length }}</span> posts found
+										<span id="active-filters" style="display: none;">
+											(Filtered by: <span id="filter-category"></span>)
+											<button class="btn btn-sm btn-link" onclick="clearFilters()">Clear</button>
+										</span>
 									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-2.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3><a href="single-blog.html">
-											Recently we create a maassive project that will
-											be a.....
-										</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
+									<div>
+										<select id="sort-posts" class="form-control form-control-sm" style="width: auto; display: inline-block;" onchange="sortPosts()">
+											<option value="newest">Newest First</option>
+											<option value="oldest">Oldest First</option>
+											<option value="title">Title A-Z</option>
+										</select>
 									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-3.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3>
-											<a href="single-blog.html">
-												Recently we create a maassive project that will
-												be a.....
-											</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
-									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-1.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3>
-											<a href="single-blog.html">Recently we create a maassive project that will
-												be a.....</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
-									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-5.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3>
-											<a href="single-blog.html">
-												Recently we create a maassive project that will
-												be a.....
-											</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
-									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-
-							<!--== Single Blog Post start ==-->
-							<div class="col-lg-6 col-md-6">
-								<article class="single-blog-post">
-									<figure class="blog-thumb">
-										<div class="blog-thumbnail">
-											<img src="{% static 'assets/images/blog/blog-6.jpg' %}" alt="Blog" class="img-fluid"/>
-										</div>
-										<figcaption class="blog-meta clearfix">
-											<a href="single-blog.html" class="author">
-												<div class="author-pic">
-													<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
-												</div>
-												<div class="author-info">
-													<h5>Daney williams</h5>
-													<p>2 hours Ago</p>
-												</div>
-											</a>
-											<div class="like-comm pull-right">
-												<a href="#"><i class="fa fa-comment-o"></i>77</a>
-												<a href="#"><i class="fa fa-heart-o"></i>12</a>
-											</div>
-										</figcaption>
-									</figure>
-
-									<div class="blog-content">
-										<h3>
-											<a href="single-blog.html">
-												Recently we create a maassive project that will
-												be a.....
-											</a>
-										</h3>
-										<p>
-											This is a big project of our company, we are happy to completed this type
-											projec which are
-											get world famous award
-										</p>
-										<a href="single-blog.html" class="btn btn-brand">More</a>
-									</div>
-								</article>
-							</div>
-							<!--== Single Blog Post End ==-->
-						</div>
-
-						<!-- Pagination Start -->
-						<div class="row">
-							<div class="col-lg-12">
-								<div class="pagination-wrap text-center">
-									<nav>
-										<ul class="pagination">
-											<li class="page-item">
-												<a class="page-link" href="#">
-													<i class="fa fa-angle-left"></i>
-												</a>
-											</li>
-											<li class="page-item active"><a class="page-link" href="#">1</a></li>
-											<li class="page-item"><a class="page-link" href="#">2</a></li>
-											<li class="page-item"><a class="page-link" href="#">3</a></li>
-											<li class="page-item"><a class="page-link" href="#">...</a></li>
-											<li class="page-item"><a class="page-link" href="#">50</a></li>
-											<li class="page-item">
-												<a class="page-link" href="#">
-													<i class="fa fa-angle-right"></i>
-												</a>
-											</li>
-										</ul>
-									</nav>
 								</div>
 							</div>
 						</div>
-						<!-- Pagination End -->
+
+						<div class="row" id="blog-posts-container">
+							<!--== Single Blog Post start ==-->
+							{% for post in posts %}
+							<div class="col-lg-6 col-md-6 blog-post-item" 
+								 data-title="{{ post.title|lower }}" 
+								 data-category="{% if post.category %}{{ post.category.name|lower }}{% endif %}"
+								 data-date="{{ post.published_date|date:'YmdHis' }}"
+								 data-author="{{ post.author.full_name|lower }}"
+								 data-content="{{ post.content|striptags|lower }}">
+								<article class="single-blog-post">
+									<figure class="blog-thumb">
+										<div class="blog-thumbnail">
+											{% if post.featured_image %}
+												<img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid"/>
+											{% else %}
+												<img src="{% static 'assets/images/blog/blog-1.jpg' %}" alt="Blog" class="img-fluid"/>
+											{% endif %}
+										</div>
+										<figcaption class="blog-meta clearfix">
+											<a href="{% url 'blog_single' post.slug %}" class="author">
+												<div class="author-pic">
+													{% if post.author.member.profile.photo %}
+														<img src="{{ post.author.member.profile.photo.url }}" alt="{{ post.author.full_name }}">
+													{% else %}
+														<img src="{% static 'assets/images/blog/author.jpg' %}" alt="Author">
+													{% endif %}
+												</div>
+												<div class="author-info">
+													<h5>{{ post.author.full_name }}</h5>
+													<p>{{ post.published_date|timesince }} ago</p>
+												</div>
+											</a>
+											<div class="like-comm pull-right">
+												{% if post.category %}
+												<span class="badge badge-primary">{{ post.category.name }}</span>
+												{% endif %}
+											</div>
+										</figcaption>
+									</figure>
+
+									<div class="blog-content">
+										<h3>
+											<a href="{% url 'blog_single' post.slug %}">
+												{{ post.title|truncatechars:50 }}
+											</a>
+										</h3>
+										<p class="post-excerpt">
+											{{ post.excerpt|default:post.content|striptags|cut:"&nbsp;"|truncatechars:200 }}
+										</p>
+										
+										<a href="{% url 'blog_single' post.slug %}" class="btn btn-brand">More</a>
+									</div>
+								</article>
+							</div>
+							{% empty %}
+							<div class="col-12">
+								<p>No blog posts available.</p>
+							</div>
+							{% endfor %}
+							<!--== Single Blog Post End ==-->
+						</div>
 					</div>
 				</div>
 				<!-- Blog content Area End -->
 
 				<!-- Sidebar Area Start -->
 				<div class="col-lg-4 order-first order-lg-last">
-
 					<div class="sidebar-area-wrap">
 						<!-- Single Sidebar Start -->
 						<div class="single-sidebar-wrap">
+							<h4 class="sidebar-title">Search Posts</h4>
 							<div class="brand-search-form">
-								<form action="index.html">
-									<input type="search" placeholder="Type and hit here">
-									<button type="button"><i class="fa fa-search"></i></button>
-								</form>
+								<input type="search" id="search-input" placeholder="Type and hit here" onkeyup="filterPosts()">
+								<button type="button" onclick="filterPosts()"><i class="fa fa-search"></i></button>
 							</div>
 						</div>
 						<!-- Single Sidebar End -->
@@ -306,33 +110,37 @@
 						<div class="single-sidebar-wrap">
 							<h4 class="sidebar-title">Categories</h4>
 							<div class="sidebar-body">
-								<ul class="brand-unorderlist">
-									<li><a href="#">Scholership</a></li>
-									<li><a href="#">Alumni</a></li>
-									<li><a href="#">Events</a></li>
-									<li><a href="#">Member</a></li>
-									<li><a href="#">Tour</a></li>
-									<li><a href="#">Current Student</a></li>
-
+								<ul class="brand-unorderlist" id="category-list">
+									<li>
+										<label class="category-filter">
+											<input type="radio" name="category" value="all" checked onchange="filterPosts()"> All Categories
+										</label>
+									</li>
+									{% for category in categories %}
+									<li>
+										<label class="category-filter">
+											<input type="radio" name="category" value="{{ category.name|lower }}" onchange="filterPosts()"> {{ category.name }}
+										</label>
+									</li>
+									{% empty %}
+									<li><a href="#">No categories</a></li>
+									{% endfor %}
 								</ul>
 							</div>
 						</div>
 						<!-- Single Sidebar End -->
 
 						<!-- Single Sidebar Start -->
-						<div class="single-sidebar-wrap d-none d-lg-block">
-							<h4 class="sidebar-title">Popular Tags</h4>
+						<div class="single-sidebar-wrap">
+							<h4 class="sidebar-title">Filter by Date</h4>
 							<div class="sidebar-body">
-								<div class="tags">
-									<a href="#">Bootstrap</a>
-									<a href="#">Design</a>
-									<a href="#">web</a>
-									<a class="active" href="#">custom</a>
-									<a href="#">wordpres</a>
-									<a href="#">Art</a>
-									<a href="#">our team</a>
-									<a href="#">Classic</a>
-								</div>
+								<select id="date-filter" class="form-control" onchange="filterPosts()">
+									<option value="all">All Time</option>
+									<option value="today">Today</option>
+									<option value="week">This Week</option>
+									<option value="month">This Month</option>
+									<option value="year">This Year</option>
+								</select>
 							</div>
 						</div>
 						<!-- Single Sidebar End -->
@@ -343,3 +151,189 @@
 		</div>
 	</div>
 </div>
+
+<script>
+// Store all posts data
+const posts = document.querySelectorAll('.blog-post-item');
+const postsContainer = document.getElementById('blog-posts-container');
+const postCountSpan = document.getElementById('post-count');
+const activeFiltersSpan = document.getElementById('active-filters');
+const filterCategorySpan = document.getElementById('filter-category');
+
+// Main filter function
+function filterPosts() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+    const dateFilter = document.getElementById('date-filter').value;
+    
+    let visibleCount = 0;
+    let activeCategory = '';
+    
+    posts.forEach(post => {
+        const title = post.dataset.title;
+        const category = post.dataset.category || '';
+        const content = post.dataset.content || '';
+        const postDate = new Date(post.dataset.date);
+        
+        // Search filter
+        const matchesSearch = searchTerm === '' || 
+                             title.includes(searchTerm) || 
+                             category.includes(searchTerm) || 
+                             content.includes(searchTerm);
+        
+        // Category filter
+        const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+        
+        // Date filter
+        const matchesDate = filterByDate(postDate, dateFilter);
+        
+        // Show/hide post
+        if (matchesSearch && matchesCategory && matchesDate) {
+            post.style.display = 'block';
+            visibleCount++;
+            if (selectedCategory !== 'all' && activeCategory === '') {
+                activeCategory = category;
+            }
+        } else {
+            post.style.display = 'none';
+        }
+    });
+    
+    // Update UI
+    postCountSpan.textContent = visibleCount;
+    
+    if (selectedCategory !== 'all') {
+        activeFiltersSpan.style.display = 'inline';
+        filterCategorySpan.textContent = activeCategory;
+    } else {
+        activeFiltersSpan.style.display = 'none';
+    }
+    
+    // Show no results message if needed
+    updateNoResultsMessage(visibleCount);
+}
+
+// Date filter helper
+function filterByDate(postDate, filter) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const monthAgo = new Date(today);
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    
+    const yearAgo = new Date(today);
+    yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+    
+    switch(filter) {
+        case 'today':
+            return postDate >= today;
+        case 'week':
+            return postDate >= weekAgo;
+        case 'month':
+            return postDate >= monthAgo;
+        case 'year':
+            return postDate >= yearAgo;
+        default:
+            return true;
+    }
+}
+
+// Sort function
+function sortPosts() {
+    const sortBy = document.getElementById('sort-posts').value;
+    const postsArray = Array.from(posts);
+    
+    postsArray.sort((a, b) => {
+        switch(sortBy) {
+            case 'newest':
+                return b.dataset.date.localeCompare(a.dataset.date);
+            case 'oldest':
+                return a.dataset.date.localeCompare(b.dataset.date);
+            case 'title':
+                return a.dataset.title.localeCompare(b.dataset.title);
+            default:
+                return 0;
+        }
+    });
+    
+    // Reorder DOM
+    postsArray.forEach(post => postsContainer.appendChild(post));
+}
+
+// Clear all filters
+function clearFilters() {
+    document.getElementById('search-input').value = '';
+    document.querySelector('input[name="category"][value="all"]').checked = true;
+    document.getElementById('date-filter').value = 'all';
+    filterPosts();
+}
+
+// Update no results message
+function updateNoResultsMessage(visibleCount) {
+    let noResultsMsg = document.getElementById('no-results-message');
+    
+    if (visibleCount === 0) {
+        if (!noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'col-12 text-center py-5';
+            noResultsMsg.innerHTML = '<h4>No posts match your filters</h4><p>Try adjusting your search criteria</p>';
+            postsContainer.appendChild(noResultsMsg);
+        }
+    } else {
+        if (noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+}
+
+// Real-time search as you type (with debounce)
+let searchTimeout;
+document.getElementById('search-input').addEventListener('keyup', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(filterPosts, 300);
+});
+
+// Initialize
+filterPosts();
+</script>
+
+<style>
+.category-filter {
+    display: block;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+.category-filter input[type="radio"] {
+    margin-right: 8px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 12px;
+    background: #023802;
+    border-radius: 3px;
+}
+
+.filter-info-bar {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+#active-filters {
+    color: #007bff;
+}
+
+#active-filters button {
+    color: #dc3545;
+    text-decoration: none;
+    margin-left: 10px;
+}
+</style>

@@ -86,24 +86,24 @@
 						<li><a href="{% url 'event' %}">Events</a></li>
 						<li><a href="{% url 'gallery' %}">Gallery</a></li>
 						<li><a href="{% url 'career' %}">Career</a></li>
+						<li><a href="{% url 'blog_list' %}">Blog</a></li>
 						<!-- <li class="has-submenu menu-item-depth-0">
 							<a href="blog.html">Blog</a>
 							<ul class="sub-menu">
-								<li><a href="blog.html">Blog List</a></li>
-								<li>
-									<a href="single-blog.html"
-									>Single Blog Right Sidebar</a
-									>
-								</li>
-								<li>
-									<a href="single-blog-leftsidebar.html"
-									>Single Bolg Left Sidebar</a
-									>
-								</li>
-								<li>
-									<a href="single-blog-nosidebar.html"
-									>Single Blog No Sidrebar</a
-									>
+								<li><a href="{% url 'blog_list' %}">Blog List</a></li>
+								
+								<li class="has-submenu menu-item-depth-0">
+									<a href="{% url 'blog_list' %}">Blog</a>
+									<ul class="sub-menu">
+										<li><a href="{% url 'blog_list' %}">Blog List</a></li>
+										{% with latest_post=blog_posts.first %}
+											{% if latest_post %}
+												<li>
+													<a href="{% url 'blog_single' latest_post.slug %}">Latest Blog Post</a>
+												</li>
+											{% endif %}
+										{% endwith %}
+									</ul>
 								</li>
 							</ul>
 						</li> -->

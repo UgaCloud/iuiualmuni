@@ -4,117 +4,83 @@
 		<div class="container">
 			<div class="row">
 				<!-- Blog content Area Start -->
-				<div class="col-lg-8">
+				<div class="col-lg-12">
 					<article class="single-blog-content-wrap">
 						<header class="article-head">
 							<div class="single-blog-thumb">
-								<img src="{% static 'assets/images/blog/blog-1.jpg' %}" class="img-fluid" alt="Blog">
+								{% if post.featured_image %}
+									<img src="{{ post.featured_image.url }}" class="img-fluid" alt="{{ post.title }}">
+								{% else %}
+									<img src="{% static 'assets/images/blog/blog-1.jpg' %}" class="img-fluid" alt="Blog">
+								{% endif %}
 							</div>
 							<div class="single-blog-meta">
-								<h2>Awesome Article for Memory of Our Campus Life</h2>
+								<h2>{{ post.title }}</h2>
 								<div class="posting-info">
-									<a href="#">23 May 2017</a> • Posted by: <a href="#">Admin</a>
+									<a href="#">{{ post.published_date|date:"d M Y" }}</a> • Posted by: <a href="#">{{ post.author.full_name }}</a>
+									{% if post.category %}
+										• in: <a href="#">{{ post.category.name }}</a>
+									{% endif %}
 								</div>
 							</div>
 						</header>
 						<section class="blog-details">
-							<p>
-								Lorem ipsum condimentum ligula. Fusce fringilla magna non sapien dictum, eget faucibus
-								dui maximus. Donec fringilla vel mi consequat tempor.
-							</p>
-							<p>
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam quis diam erat. Duvelit
-								lecspoe a blandit sit amet, tempor at lorem. Donec ultricies, lorem sed ultrices
-								interdum, leo luctfiiius sem, vel vulputate diam ipsum sed lorem. Donec tempor arcu
-								nisl, et molestie massa hhisque ut. Nunc at rutrum leo. Mauris metus mauris, tridd.
-							</p>
-							<p>
-								Mauris tempus erat laoreet turpis lobortis, eu tincidunt erat fermentum. Aliquam nonh
-								edunt urna. Integer tincidunt nec nisl vitae ullamcorper. Proin sed ultrices erat.
-								Praesent vdd warius ultricemassa at faucibus. Aenean dignissim, orci sed faucibus
-								pharetra, dui mi dir ssim tortor, sit amet ntum mi ligula sit amet augue. Pellentesqs
-								placerat.
-							</p>
-							<img src="{% static 'assets/images/blog/single-blog.jpg' %}" class="img-fluid" alt="Blog">
-							<div class="row">
-								<div class="col-lg-6">
-									<h5>The Guest Series</h5>
-									<p>
-										Mauris tempus erat laoreet turpis lobortis, eu tincidunt erat fermentum. Aliquam
-										non tidunt urna. Integer tincidunt nec nisl vitae Proin sed ultrices erat.
-									</p>
-								</div>
-								<div class="col-lg-6">
-									<h5>How and why</h5>
-									<p>
-										Aenean dignissim, orci sed faucibus nissim tortor, sit amet condimentum mi
-										ligula
-										sit amet augue.
-									</p>
-								</div>
-							</div>
-							<blockquote class="blockquote">
-								Integer tincidunt nec nisl vitae ullamcorper. Proin sed ultrices erat. Praesent varius
-								ultrices massa at faucibus.
-							</blockquote>
+							{{ post.content|safe }}
 						</section>
-						<footer class="post-share">
+						<!-- <footer class="post-share">
 							<div class="row no-gutters ">
 								<div class="col-8">
 									<div class="shareonsocial">
 										<span>Share:</span>
-										<a href="#"><i class="fab fa-facebook-f"></i></a>
-										<a href="#"><i class="fab fa-twitter"></i></a>
-										<a href="#"><i class="fab fa-linkedin-in"></i></a>
-										<a href="#"><i class="fab fa-vimeo"></i></a>
+										<a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+										<a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}" target="_blank"><i class="fab fa-twitter"></i></a>
+										<a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ post.title }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+										<a href="mailto:?subject={{ post.title }}&body={{ request.build_absolute_uri }}" target="_blank"><i class="fab fa-vimeo"></i></a>
 									</div>
 								</div>
 								<div class="col-4 text-end">
 									<div class="post-like-comm">
-										<a href="#"><i class="far fa-thumbs-up"></i>20</a>
-										<a href="#"><i class="far fa-comments"></i>15</a>
+										<a href="#"><i class="far fa-thumbs-up"></i>{{ post.views_count }}</a>
+										<a href="#"><i class="far fa-comments"></i>0</a>
 									</div>
 								</div>
 							</div>
-						</footer>
+						</footer> -->
 					</article>
 				</div>
 				<!-- Blog content Area End -->
 
-				<!-- Sidebar Area Start -->
+				<!-- Sidebar Area Start --
 				<div class="col-lg-4 order-first order-lg-last">
-
 					<div class="sidebar-area-wrap">
-						<!-- Single Sidebar Start -->
+						<!-- Single Sidebar Start --
 						<div class="single-sidebar-wrap">
 							<div class="brand-search-form">
-								<form action="index.html">
-									<input type="search" placeholder="Type and hit here">
-									<button type="button"><i class="fa fa-search"></i></button>
+								<form action="{% url 'blog_list' %}" method="GET">
+									<input type="search" name="q" placeholder="Type and hit here">
+									<button type="submit"><i class="fa fa-search"></i></button>
 								</form>
 							</div>
 						</div>
 						<!-- Single Sidebar End -->
 
-						<!-- Single Sidebar Start -->
+						<!-- Single Sidebar Start -
 						<div class="single-sidebar-wrap">
 							<h4 class="sidebar-title">Categories</h4>
 							<div class="sidebar-body">
 								<ul class="brand-unorderlist">
-									<li><a href="#">Scholership</a></li>
-									<li><a href="#">Alumni</a></li>
-									<li><a href="#">Events</a></li>
-									<li><a href="#">Member</a></li>
-									<li><a href="#">Tour</a></li>
-									<li><a href="#">Current Student</a></li>
-
+									{% for category in categories %}
+									<li><a href="#">{{ category.name }}</a></li>
+									{% empty %}
+									<li><a href="#">No categories</a></li>
+									{% endfor %}
 								</ul>
 							</div>
 						</div>
 						<!-- Single Sidebar End -->
 
 						<!-- Single Sidebar Start -->
-						<div class="single-sidebar-wrap d-none d-lg-block">
+						<!-- <div class="single-sidebar-wrap d-none d-lg-block">
 							<h4 class="sidebar-title">Popular Tags</h4>
 							<div class="sidebar-body">
 								<div class="tags">
@@ -128,7 +94,7 @@
 									<a href="#">Classic</a>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						<!-- Single Sidebar End -->
 					</div>
 				</div>
