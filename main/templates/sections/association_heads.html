@@ -22,21 +22,20 @@
                                 {% if item.profile.photo %}
                                     <img src="{{ item.profile.photo.url }}" 
                                          class="img-fluid rounded" 
-                                         alt="{{ item.leader.user.member.full_name }}"
+                                         alt="{{ item.leader.member.full_name }}"
                                          >
                                 {% else %}
                                     <img src="{% static 'assets/images/committee/default.png' %}" 
                                          class="img-fluid rounded" 
-                                         alt="{{ item.leader.user.full_name }}"
+                                         alt="{{ item.leader.member.full_name }}"
                                         >
                                 {% endif %}
                             </div>
                             <h3>
-                                {{ item.leader.user.member.full_name|default:item.leader.user.member.member_id|upper }}
+                                {{ item.leader.member.full_name|default:item.leader.member.member_id|upper }}
                                 <span class="committee-deg d-block mt-2">
                                     {{ item.leader.position.display_title }}
                                 </span>
-                               
                             </h3>
                         </div>
                     </a>
@@ -45,21 +44,20 @@
                         <div class="commitee-thumb">
                             <img src="{% static 'assets/images/committee/default.png' %}" 
                                  class="img-fluid rounded" 
-                                 alt="{{ item.leader.user.member.full_name }}"
+                                 alt="{{ item.leader.member.full_name }}"
                                 >
                         </div>
                         <h3>
-                            {{ item.leader.user.member.full_name|default:item.leader.user.member.member_id|upper }}
+                            {{ item.leader.member.full_name|default:item.leader.member.member_id|upper }}
                             <span class="committee-deg d-block mt-2">
                                 {{ item.leader.position.display_title }}
                             </span>
-                            
                         </h3>
                     </div>
                     {% endif %}
                 </div>
                 {% endfor %}
-                {% else %}
+                {% elif leaders_with_profiles %}
                 {% for item in leaders_with_profiles %}
                 <div class="col-lg-3 col-sm-6 mb-4">
                     {% if item.profile %}
@@ -69,21 +67,20 @@
                                 {% if item.profile.photo %}
                                     <img src="{{ item.profile.photo.url }}" 
                                          class="img-fluid rounded" 
-                                         alt="{{ item.leader.user.member.full_name }}"
+                                         alt="{{ item.full_name|default:item.leader.member.full_name }}"
                                          >
                                 {% else %}
                                     <img src="{% static 'assets/images/committee/default.png' %}" 
                                          class="img-fluid rounded" 
-                                         alt="{{ item.leader.user.full_name }}"
+                                         alt="{{ item.full_name|default:item.leader.member.full_name }}"
                                         >
                                 {% endif %}
                             </div>
                             <h3>
-                                {{ item.leader.user.member.full_name|default:item.leader.user.member.member_id|upper }}
+                                {{ item.full_name|default:item.leader.member.full_name|upper }}
                                 <span class="committee-deg d-block mt-2">
-                                    {{ item.leader.position.display_title }}
+                                    {{ item.position|default:item.leader.position.display_title }}
                                 </span>
-                               
                             </h3>
                         </div>
                     </a>
@@ -92,23 +89,20 @@
                         <div class="commitee-thumb">
                             <img src="{% static 'assets/images/committee/default.png' %}" 
                                  class="img-fluid rounded" 
-                                 alt="{{ item.leader.user.member.full_name }}"
+                                 alt="{{ item.full_name|default:item.leader.member.full_name }}"
                                 >
                         </div>
                         <h3>
-                            {{ item.leader.user.member.full_name|default:item.leader.user.member.member_id|upper }}
+                            {{ item.full_name|default:item.leader.member.full_name|upper }}
                             <span class="committee-deg d-block mt-2">
-                                {{ item.leader.position.display_title }}
+                                {{ item.position|default:item.leader.position.display_title }}
                             </span>
-                            
                         </h3>
                     </div>
                     {% endif %}
                 </div>
                 {% endfor %}
-                {% endif %}
-                
-                {% if not page_obj and not leaders_with_profiles %}
+                {% else %}
                 <div class="col-12 text-center">
                     <div class="alert alert-info">
                         <p class="mb-0">No association leaders found.</p>
