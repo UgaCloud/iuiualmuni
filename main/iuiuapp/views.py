@@ -16,15 +16,6 @@ from .forms import *
 from django.http import JsonResponse
 
 
-
-
-
-
-
-
-
-
-
 def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
@@ -77,6 +68,7 @@ def register(request):
     }
     return render(request, 'register.html', context)
 
+
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -126,6 +118,7 @@ class LoginView(View):
         
         return render(request, 'login.html')
 
+
 class LogoutView(View):
     def get(self, request):
         if request.user.is_authenticated and hasattr(request.user, 'member'):
@@ -141,6 +134,7 @@ class LogoutView(View):
         logout(request)
         messages.success(request, 'You have been logged out successfully.')
         return redirect('login')
+
 
 class ProfileDetailView(DetailView):
     model = Profile
@@ -160,10 +154,14 @@ class ProfileDetailView(DetailView):
         
         if hasattr(profile.member, 'user_account'):
             user = profile.member.user_account
-            context['is_association_leader'] = user.is_association_leader
-            context['current_leadership'] = user.current_leadership_assignment
-            context['leadership_history'] = user.leadership_history[:5]
-            context['active_committees'] = user.active_committees
+            
+            # FIXED: Use member instead of user for leadership queries
+            context['is_association_leader'] = profile.member.is_association_leader
+            context['current_leadership'] = profile.member.current_leadership_assignment
+            context['leadership_history'] = profile.member.leadership_history[:5]
+            
+            # FIXED: Committee memberships are on user, not member
+            context['active_committees'] = user.active_committees if user else []
         else:
             context['is_association_leader'] = False
             context['current_leadership'] = None
@@ -172,27 +170,26 @@ class ProfileDetailView(DetailView):
         
         return context
 
+
 def association_heads_view(request):
     """
     View for displaying ONLY association heads (leaders)
     Excludes regular members and committee members
     """
-    # Get all active leadership assignments
+    # FIXED: Changed from 'user__member__profile' to 'member' and 'member__profile'
     active_leadership = AssociationLeadership.objects.filter(
         is_active=True
     ).select_related(
-        'user__member__profile',
+        'member',  # Direct access to Member
+        'member__profile',  # Access Profile through Member
         'position'
     ).order_by('position__order')
     
     # Create a list of tuples with leader and profile
     leaders_with_profiles = []
     for leader in active_leadership:
-        # Get the profile for this leader's member
-        try:
-            profile = Profile.objects.get(member=leader.user.member, is_public=True)
-        except Profile.DoesNotExist:
-            profile = None
+        # FIXED: Access profile through leader.member, not leader.user.member
+        profile = leader.member.profile if hasattr(leader.member, 'profile') and leader.member.profile.is_public else None
         
         leaders_with_profiles.append({
             'leader': leader,
@@ -211,8 +208,6 @@ def association_heads_view(request):
     return render(request, 'association_heads.html', context)
 
 
-
-
 def blog_list(request):
     # Get all published blog posts
     posts = BlogPost.objects.filter(status='PUBLISHED').select_related('author__member', 'category')
@@ -225,6 +220,7 @@ def blog_list(request):
         'categories': categories,
     }
     return render(request, 'blog.html', context)
+
 
 def blogsingle(request, slug):
     # Get single blog post by slug
@@ -244,16 +240,8 @@ def blogsingle(request, slug):
     return render(request, 'single-blog.html', context)
 
 
-
-
-# def blogsingle_nosidebar(request):
-#     return render (request, 'single-blog-nosidebar.html')
-
-# def blogsingle_leftsidebar(request):
-#     return render (request, 'single-blog-leftsidebar.html')
-
-
 def committee_heads_view(request):
+    # FIXED: Changed from 'user__member__profile' to 'user' and 'user__member__profile'
     committee_heads = CommitteeMembership.objects.filter(
         Q(role__icontains='chair') | 
         Q(role__icontains='coordinator') |
@@ -261,7 +249,9 @@ def committee_heads_view(request):
         Q(role__icontains='lead'),
         is_active=True
     ).select_related(
-        'user__member__profile',
+        'user',  # Direct access to User
+        'user__member',  # Access Member through User
+        'user__member__profile',  # Access Profile through Member
         'committee'
     ).order_by('committee__order', 'user__full_name')
     
@@ -272,7 +262,8 @@ def committee_heads_view(request):
             unique_committee_heads.append(head)
             seen_users.add(head.user.id)
     
-    head_members = [head.user.member for head in unique_committee_heads]
+    # FIXED: Get members from user.member
+    head_members = [head.user.member for head in unique_committee_heads if hasattr(head.user, 'member')]
     profiles = Profile.objects.filter(
         member__in=head_members,
         is_public=True
@@ -286,25 +277,32 @@ def committee_heads_view(request):
     
     return render(request, 'committee_heads.html', context)
 
+
 def regular_members_view(request):
-    association_leader_user_ids = AssociationLeadership.objects.filter(
+    # FIXED: Get association leader member IDs directly from AssociationLeadership
+    association_leader_member_ids = AssociationLeadership.objects.filter(
         is_active=True
-    ).values_list('user_id', flat=True)
+    ).values_list('member_id', flat=True)  # Changed from 'user_id' to 'member_id'
     
+    # FIXED: Get committee member user IDs, then get their member IDs
     active_committee_user_ids = CommitteeMembership.objects.filter(
         is_active=True
     ).values_list('user_id', flat=True).distinct()
     
-    excluded_user_ids = set(list(association_leader_user_ids) + list(active_committee_user_ids))
-    
-    excluded_member_ids = []
-    for user_id in excluded_user_ids:
+    # Get member IDs from committee members
+    committee_member_ids = []
+    for user_id in active_committee_user_ids:
         try:
             user = User.objects.get(id=user_id)
-            excluded_member_ids.append(user.member.id)
+            if hasattr(user, 'member'):
+                committee_member_ids.append(user.member.id)
         except User.DoesNotExist:
             pass
     
+    # Combine excluded member IDs
+    excluded_member_ids = set(list(association_leader_member_ids) + committee_member_ids)
+    
+    # Get public profiles excluding leaders and committee members
     profiles_list = Profile.objects.filter(
         is_public=True
     ).exclude(
@@ -323,6 +321,7 @@ def regular_members_view(request):
     
     return render(request, 'members.html', context)
 
+
 def all_members_directory_view(request):
     profiles_list = Profile.objects.filter(
         is_public=True
@@ -336,14 +335,25 @@ def all_members_directory_view(request):
     if campus_filter:
         profiles_list = profiles_list.filter(campus_id=campus_filter)
     
+    # Pre-fetch leader and committee status for efficiency
+    leader_member_ids = set(AssociationLeadership.objects.filter(
+        is_active=True
+    ).values_list('member_id', flat=True))
+    
+    committee_member_ids = set()
+    for user_id in CommitteeMembership.objects.filter(
+        is_active=True
+    ).values_list('user_id', flat=True).distinct():
+        try:
+            user = User.objects.get(id=user_id)
+            if hasattr(user, 'member'):
+                committee_member_ids.add(user.member.id)
+        except User.DoesNotExist:
+            pass
+    
     for profile in profiles_list:
-        profile.is_leader = False
-        profile.is_committee_member = False
-        
-        if hasattr(profile.member, 'user_account'):
-            user = profile.member.user_account
-            profile.is_leader = user.is_association_leader
-            profile.is_committee_member = user.active_committees.exists()
+        profile.is_leader = profile.member.id in leader_member_ids
+        profile.is_committee_member = profile.member.id in committee_member_ids
     
     paginator = Paginator(profiles_list, 12)
     page_number = request.GET.get('page')
@@ -361,8 +371,8 @@ def all_members_directory_view(request):
     
     return render(request, 'members_committee.html', context)
 
-def index(request):
 
+def index(request):
     jobs = JobAdvertisement.objects.filter(is_active=True).order_by('-display_order', '-posted_date')[:6]
     
     # Get the closest upcoming event (the one that is soonest)
@@ -373,7 +383,7 @@ def index(request):
     
     context = {
         'upcoming_event': upcoming_event,
-        'jobs': jobs,  # Changed from 'job' to 'jobs' to match template variable name
+        'jobs': jobs,
     }
     
     if request.user.is_authenticated:
@@ -389,15 +399,15 @@ def about(request):
     active_leadership = AssociationLeadership.objects.filter(
         is_active=True
     ).select_related(
-        'member',  # Changed from 'user__member' to just 'member'
-        'member__profile',  # Directly access profile through member
+        'member',
+        'member__profile',
         'position'
     ).order_by('position__order')
     
     # Create a list of tuples with leader and profile
     leaders_with_profiles = []
     for leader in active_leadership:
-        # Get the profile for this leader's member (already loaded with select_related)
+        # Get the profile for this leader's member
         profile = leader.member.profile if hasattr(leader.member, 'profile') and leader.member.profile.is_public else None
         
         leaders_with_profiles.append({
@@ -509,9 +519,9 @@ def event(request):
     # CONTEXT
     # -----------------------------
     context = {
-        'events': page_obj,  # For backward compatibility with event_list.html
-        'active_events': active_events_qs,  # All filtered active events (no pagination)
-        'inactive_events': inactive_events_qs,  # All filtered inactive events (no pagination)
+        'events': page_obj,
+        'active_events': active_events_qs,
+        'inactive_events': inactive_events_qs,
         'active_tab': active_tab,
         'active_count': Event.objects.filter(is_active=True).count(),
         'inactive_count': Event.objects.filter(is_active=False).count(),
@@ -540,8 +550,10 @@ def single_event(request, event_slug):
     
     return render(request, 'single-event.html', context)
 
+
 def contact(request):
     return render(request, 'contact.html')
+
 
 def gallery(request):
     category = request.GET.get('category', 'All')
@@ -558,10 +570,8 @@ def gallery(request):
         if db_event_type:
             albums = albums.filter(event__event_type=db_event_type)
     
-   
     albums = albums.order_by('-album_date')
     
-  
     paginator = Paginator(albums, 6) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -572,6 +582,7 @@ def gallery(request):
     }
     
     return render(request, 'gallery.html', context)
+
 
 def gallery_single(request, album_slug=None):
     if album_slug:
@@ -594,9 +605,9 @@ def gallery_single(request, album_slug=None):
     return render(request, 'single-album.html', context)
 
 
-
 def directory(request):
     return render(request, 'directory.html')
+
 
 def career(request):
     # Get only active job advertisements
@@ -606,8 +617,10 @@ def career(request):
     }
     return render(request, 'career.html', context)
 
+
 def loginview(request):
     return render(request, 'login.html')
+
 
 @login_required
 def dashboard(request):
@@ -619,14 +632,15 @@ def dashboard(request):
             context['profile'] = Profile.objects.get(member=member)
         except Profile.DoesNotExist:
             context['profile'] = None
-        context['is_leader'] = request.user.is_association_leader
-        context['current_leadership'] = request.user.current_leadership_assignment
-        context['active_committees'] = request.user.active_committees
+        
+        # FIXED: Use member properties for leadership
+        context['is_leader'] = member.is_association_leader
+        context['current_leadership'] = member.current_leadership_assignment
+        context['active_committees'] = request.user.active_committees  # Committees are on user
         context['total_members'] = Member.objects.filter(is_active_member=True).count()
         context['total_users'] = User.objects.filter(is_active=True).count()
         context['total_leaders'] = AssociationLeadership.objects.filter(is_active=True).count()
     return render(request, 'dashboard.html', context)
-
 
 
 @login_required
@@ -684,7 +698,6 @@ def profile_update(request):
         'profile': profile,
     }
     return render(request, 'profile_update.html', context)
-
 
 
 @user_passes_test(lambda u: u.is_staff)
@@ -755,8 +768,4 @@ def admin_dashboard(request):
         'total_without_accounts': members_without_accounts.count(),
     }
     return render(request, 'admin_dashboard.html', context)
-
-
-
-
 
