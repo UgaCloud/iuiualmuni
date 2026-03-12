@@ -5,7 +5,7 @@ mysql-connector-python
 pymysql
 pillow
 sqlparse
-
+django-ckeditor-5
 
 
 
