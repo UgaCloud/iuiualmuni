@@ -742,60 +742,15 @@ class EventRegistration(models.Model):
 
 
 class GalleryAlbum(models.Model):
-    title = models.CharField(
-        max_length=200,
-        verbose_name="Album Title"
-    )
-    
-    slug = models.SlugField(
-        max_length=200,
-        unique=True,
-        verbose_name="URL Slug"
-    )
-    
-    description = models.TextField(
-        blank=True,
-        verbose_name="Album Description"
-    )
-    
-    event = models.ForeignKey(
-        Event,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='albums',
-        verbose_name="Related Event"
-    )
-    
-    album_date = models.DateField(
-        default=timezone.now,
-        verbose_name="Album Date"
-    )
-    
-    cover_image = models.ImageField(
-        upload_to='gallery/covers/',
-        blank=True,
-        null=True,
-        verbose_name="Cover Image"
-    )
-    
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Active Album"
-    )
-    
-    is_featured = models.BooleanField(
-        default=False,
-        verbose_name="Featured Album"
-    )
-    
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='created_albums',
-        verbose_name="Created By"
-    )
+    title = models.CharField(max_length=200,verbose_name="Album Title")
+    slug = models.SlugField(max_length=200, unique=True,verbose_name="URL Slug")
+    description = models.TextField(blank=True, verbose_name="Album Description")
+    event = models.ForeignKey(Event, on_delete=models.SET_NULL,  null=True, blank=True, related_name='albums',verbose_name="Related Event")
+    album_date = models.DateField(default=timezone.now, verbose_name="Album Date")
+    cover_image = models.ImageField(upload_to='gallery/covers/',blank=True,null=True,verbose_name="Cover Image")
+    is_active = models.BooleanField(default=True,verbose_name="Active Album")
+    is_featured = models.BooleanField(default=False,verbose_name="Featured Album")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_albums',verbose_name="Created By")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -817,6 +772,10 @@ class GalleryAlbum(models.Model):
         return self.images.count()
     total_images.short_description = "Total Images"
     
+    def total_videos(self):
+        return self.videos.count()
+    total_videos.short_description = "Total videos"
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             from django.utils.text import slugify
@@ -831,45 +790,13 @@ class GalleryAlbum(models.Model):
 
 
 class GalleryImage(models.Model):
-    album = models.ForeignKey(
-        GalleryAlbum,
-        on_delete=models.CASCADE,
-        related_name='images',
-        verbose_name="Album"
-    )
-    
-    title = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name="Image Title"
-    )
-    
-    image = models.ImageField(
-        upload_to='gallery/images/',
-        verbose_name="Image File"
-    )
-    
-    caption = models.TextField(
-        blank=True,
-        verbose_name="Caption"
-    )
-    
-    taken_date = models.DateField(
-        null=True,
-        blank=True,
-        verbose_name="Date Taken"
-    )
-    
-    is_featured = models.BooleanField(
-        default=False,
-        verbose_name="Featured Image"
-    )
-    
-    order = models.PositiveIntegerField(
-        default=0,
-        verbose_name="Display Order"
-    )
-    
+    album = models.ForeignKey(GalleryAlbum, on_delete=models.CASCADE, related_name='images', verbose_name="Album")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Image Title")
+    image = models.ImageField(upload_to='gallery/images/', verbose_name="Image File")
+    caption = models.TextField(blank=True, verbose_name="Caption")
+    taken_date = models.DateField(null=True, blank=True, verbose_name="Date Taken")
+    is_featured = models.BooleanField(default=False, verbose_name="Featured Image")
+    order = models.PositiveIntegerField(default=0, verbose_name="Display Order")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -883,6 +810,29 @@ class GalleryImage(models.Model):
     
     def __str__(self):
         return self.title or f"Image in {self.album.title}"    
+    
+
+class GalleryVideo(models.Model):
+    album = models.ForeignKey(GalleryAlbum, on_delete=models.CASCADE, related_name='videos', verbose_name="Album")
+    title = models.CharField(max_length=200, blank=True, verbose_name="video Title")
+    video = models.FileField(upload_to='gallery/videos/', verbose_name="video File")
+    caption = models.TextField(blank=True, verbose_name="Caption")
+    captured_date = models.DateField(null=True, blank=True, verbose_name="Date Captured")
+    is_featured = models.BooleanField(default=False, verbose_name="Featured video")
+    order = models.PositiveIntegerField(default=0, verbose_name="Display Order")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = "Gallery video"
+        verbose_name_plural = "Gallery videos"
+        indexes = [
+            models.Index(fields=['album', 'is_featured']),
+            models.Index(fields=['album', 'order']),
+        ]
+    
+    def __str__(self):
+        return self.title or f"video in {self.album.title}" 
     
 
 

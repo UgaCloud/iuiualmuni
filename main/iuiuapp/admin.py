@@ -496,7 +496,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(GalleryAlbum)
 class GalleryAlbumAdmin(admin.ModelAdmin):
-    list_display = ('title', 'album_date', 'is_active', 'is_featured', 'total_images')
+    list_display = ('title', 'album_date', 'is_active', 'is_featured', 'total_images', 'total_videos')
     list_filter = ('is_active', 'is_featured', 'album_date')
     search_fields = ('title', 'description')
     prepopulated_fields = {'slug': ('title',)}
@@ -531,6 +531,29 @@ class GalleryImageAdmin(admin.ModelAdmin):
         }),
         ('Settings', {
             'fields': ('taken_date', 'is_featured', 'order')
+        }),
+        ('Meta', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('created_at',)
+
+
+@admin.register(GalleryVideo)
+class GalleryVideoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'album', 'captured_date', 'is_featured', 'order')
+    list_filter = ('album', 'is_featured', 'captured_date')
+    search_fields = ('title', 'caption', 'album__title')
+    date_hierarchy = 'captured_date'
+    
+    fieldsets = (
+        ('Video Details', {
+            'fields': ('album', 'title', 'video', 'caption')
+        }),
+        ('Settings', {
+            'fields': ('captured_date', 'is_featured', 'order')
         }),
         ('Meta', {
             'fields': ('created_at',),

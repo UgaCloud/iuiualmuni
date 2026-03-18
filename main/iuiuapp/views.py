@@ -597,9 +597,11 @@ def gallery_single(request, album_slug=None):
         context = {'album': None, 'images': []}
     else:
         images = album.images.all().order_by('order', '-created_at')
+        videos = album.videos.all().order_by('order', '-created_at')
         context = {
             'album': album,
             'images': images,
+            'videos':videos,
         }
     
     return render(request, 'single-album.html', context)
