@@ -587,21 +587,22 @@ def gallery(request):
 def gallery_single(request, album_slug=None):
     if album_slug:
         try:
-            album = GalleryAlbum.objects.prefetch_related('images').get(slug=album_slug, is_active=True)
+            album = GalleryAlbum.objects.prefetch_related('images', 'videos').get(slug=album_slug, is_active=True)
         except GalleryAlbum.DoesNotExist:
-            album = GalleryAlbum.objects.prefetch_related('images').filter(is_active=True).first()
+            album = GalleryAlbum.objects.prefetch_related('images', 'videos').filter(is_active=True).first()
     else:
-        album = GalleryAlbum.objects.prefetch_related('images').filter(is_active=True).first()
+        album = GalleryAlbum.objects.prefetch_related('images', 'videos').filter(is_active=True).first()
     
     if not album:
-        context = {'album': None, 'images': []}
+        context = {'album': None, 'images': [], 'videos': []}
     else:
         images = album.images.all().order_by('order', '-created_at')
         videos = album.videos.all().order_by('order', '-created_at')
+        
         context = {
             'album': album,
             'images': images,
-            'videos':videos,
+            'videos': videos,
         }
     
     return render(request, 'single-album.html', context)
